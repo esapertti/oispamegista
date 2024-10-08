@@ -11,12 +11,12 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #faf8ef;
+            background-color: white; /* Muutettu taustaväri valkoiseksi */
             font-family: Arial, sans-serif;
         }
         .game-container {
-            width: 640px;
-            height: 640px;
+            width: 640px; /* Ruudun leveys */
+            height: 640px; /* Ruudun korkeus */
             background-color: #bbada0;
             border-radius: 10px;
             display: grid;
@@ -31,20 +31,37 @@
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
+            flex-direction: column; /* Lisätty, jotta kuva ja numero mahtuvat päällekkäin */
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            position: relative;
+        }
+        .tile img {
+            width: 100%; /* Kuva vie koko ruudun */
+            height: auto; /* Säilyttää kuvan suhteet */
+            max-height: 70%; /* Kuvan maksimikorkeus */
+            border-radius: 5px;
+        }
+        .tile-number {
+            position: absolute;
+            bottom: 5px; /* Numero on kuvien alareunassa */
             color: #776e65;
-            transition: background-color 0.3s ease, transform 0.1s ease;
+            font-size: 20px; /* Pienempi fonttikoko numerolle */
         }
         .score {
             font-size: 24px;
             margin: 20px;
+            border: 2px solid red; /* Punainen reunus pisteille */
+            padding: 10px; /* Tilaa reunuksen sisällä */
+            border-radius: 5px; /* Kulmat pyöristetty */
         }
         .high-score {
             font-size: 24px;
             margin: 20px;
-            color: #f39c12; /* Different color for high score */
+            color: #f39c12; /* Eri väri ennätykselle */
+            border: 2px solid red; /* Punainen reunus ennätykselle */
+            padding: 10px; /* Tilaa reunuksen sisällä */
+            border-radius: 5px; /* Kulmat pyöristetty */
         }
         .button {
             padding: 10px 20px;
@@ -86,7 +103,21 @@
         const notification = document.getElementById("notification");
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
-        let highScore = 0; // Muuttuja ennätykselle
+        let highScore = localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0; // Haetaan ennätys localStoragesta
+
+        const tileImages = {
+            2: 'images/kuva2.png',
+            4: 'images/kuva4.png',
+            8: 'images/kuva8.png',
+            16: 'images/kuva16.png',
+            32: 'images/kuva32.png',
+            64: 'images/kuva64.png',
+            128: 'images/kuva128.png',
+            256: 'images/kuva256.png',
+            512: 'images/kuva512.png',
+            1024: 'images/kuva1024.png',
+            2048: 'images/kuva2048.png'
+        };
 
         function addNewTile() {
             let emptyCells = [];
@@ -107,11 +138,20 @@
                 row.forEach(tile => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
-                    tileElement.textContent = tile === 0 ? '' : tile;
+                    if (tile !== 0) {
+                        const img = document.createElement('img');
+                        img.src = tileImages[tile]; // Asetetaan kuva
+                        tileElement.appendChild(img);
+                        const numberElement = document.createElement('div');
+                        numberElement.className = 'tile-number';
+                        numberElement.textContent = tile; // Asetetaan numero kuvien alle
+                        tileElement.appendChild(numberElement);
+                    }
                     container.appendChild(tileElement);
                 });
             });
             container.appendChild(notification); // Re-add notification after drawing board
+            highScoreElement.textContent = `Ennätys: ${highScore}`; // Näytetään ennätys
         }
 
         function move(direction) {
@@ -133,6 +173,10 @@
                                 board[i][k] = 0;
                                 score += board[i][k - 1];  // Lisää pisteet
                                 moved = true;
+                                if (score > highScore) {
+                                    highScore = score; // Päivitetään ennätys
+                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
+                                }
                             }
                         }
                     }
@@ -155,6 +199,10 @@
                                 board[i][k] = 0;
                                 score += board[i][k + 1];  // Lisää pisteet
                                 moved = true;
+                                if (score > highScore) {
+                                    highScore = score; // Päivitetään ennätys
+                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
+                                }
                             }
                         }
                     }
@@ -177,6 +225,10 @@
                                 board[k][j] = 0;
                                 score += board[k - 1][j];  // Lisää pisteet
                                 moved = true;
+                                if (score > highScore) {
+                                    highScore = score; // Päivitetään ennätys
+                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
+                                }
                             }
                         }
                     }
@@ -199,67 +251,64 @@
                                 board[k][j] = 0;
                                 score += board[k + 1][j];  // Lisää pisteet
                                 moved = true;
+                                if (score > highScore) {
+                                    highScore = score; // Päivitetään ennätys
+                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
+                                }
                             }
                         }
                     }
                 }
             };
 
-            // Suorita liikettä riippuen suunnasta
             switch (direction) {
-                case 'left': moveLeft(); break;
-                case 'right': moveRight(); break;
-                case 'up': moveUp(); break;
-                case 'down': moveDown(); break;
+                case 'left':
+                    moveLeft();
+                    break;
+                case 'right':
+                    moveRight();
+                    break;
+                case 'up':
+                    moveUp();
+                    break;
+                case 'down':
+                    moveDown();
+                    break;
             }
 
             if (moved) {
                 addNewTile();
                 drawBoard();
-                scoreElement.textContent = `Pisteet: ${score}`;
-                // Päivitetään ennätys
-                if (score > highScore) {
-                    highScore = score;
-                    highScoreElement.textContent = `Ennätys: ${highScore}`;
-                }
             }
         }
 
-        function removeLowTiles() {
-            if (score >= 1000) {
-                board = board.map(row => row.map(tile => (tile < 16 ? 0 : tile)));
-                score -= 1000; // Vähennä pisteet
-                scoreElement.textContent = `Pisteet: ${score}`;
-                drawBoard();
-                notification.style.display = 'none'; // Piilota ilmoitus
-            } else {
-                notification.style.display = 'block'; // Näytä ilmoitus
-                setTimeout(() => {
-                    notification.style.opacity = '0'; // Fade out
-                    setTimeout(() => {
-                        notification.style.display = 'none'; // Piilota ilmoitus
-                        notification.style.opacity = '1'; // Reset opacity
-                    }, 1000); // 1 sekunnin kuluttua, kun fade out on valmis
-                }, 5000); // Näytä 5 sekunnin kuluttua
+        function handleKeyPress(event) {
+            switch (event.key) {
+                case 'ArrowLeft':
+                    move('left');
+                    break;
+                case 'ArrowRight':
+                    move('right');
+                    break;
+                case 'ArrowUp':
+                    move('up');
+                    break;
+                case 'ArrowDown':
+                    move('down');
+                    break;
             }
         }
 
-        document.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'ArrowLeft': move('left'); break;
-                case 'ArrowRight': move('right'); break;
-                case 'ArrowUp': move('up'); break;
-                case 'ArrowDown': move('down'); break;
-            }
+        document.addEventListener('keydown', handleKeyPress);
+        addNewTile(); // Lisätään uusi laatta alussa
+        drawBoard(); // Piirretään taulu alussa
+
+        juomegistaButton.addEventListener('click', () => {
+            notification.style.display = 'block'; // Näytetään ilmoitus
+            setTimeout(() => {
+                notification.style.display = 'none'; // Piilotetaan ilmoitus
+            }, 2000);
         });
-
-        juomegistaButton.addEventListener('click', removeLowTiles);
-
-        // Alustetaan peli
-        addNewTile();
-        addNewTile();
-        drawBoard();
     </script>
-
 </body>
 </html>
