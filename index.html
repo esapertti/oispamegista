@@ -11,12 +11,12 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white; /* Taustaväri valkoiseksi */
+            background-color: white; /* Vaihda tausta valkoiseksi */
             font-family: Arial, sans-serif;
         }
         .game-container {
-            width: 640px; /* Ruudun leveys */
-            height: 640px; /* Ruudun korkeus */
+            width: 400px; /* Peliruudun leveys */
+            height: 400px; /* Peliruudun korkeus */
             background-color: #bbada0;
             border-radius: 10px;
             display: grid;
@@ -26,42 +26,23 @@
             position: relative;
         }
         .tile {
-            width: 100%;
-            height: 100%;
+            width: 90px;
+            height: 90px;
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Kuvan ja numeron asettaminen päällekkäin */
             justify-content: center;
             align-items: center;
-            position: relative;
-        }
-        .tile img {
-            width: 100%; /* Kuva vie koko ruudun */
-            height: auto; /* Säilyttää kuvan suhteet */
-            max-height: 70%; /* Kuvan maksimikorkeus */
-            border-radius: 5px;
-        }
-        .tile-number {
-            position: absolute;
-            bottom: 5px; /* Numero on kuvien alareunassa */
+            font-size: 24px;
             color: #776e65;
-            font-size: 20px; /* Pienempi fonttikoko numerolle */
+            transition: background-color 0.3s ease, transform 0.1s ease;
         }
-        .score {
+        .score, .high-score {
             font-size: 24px;
             margin: 20px;
-            border: 2px solid red; /* Punainen reunus pisteille */
-            padding: 10px; /* Tilaa reunuksen sisällä */
-            border-radius: 5px; /* Kulmat pyöristetty */
-        }
-        .high-score {
-            font-size: 24px;
-            margin: 20px;
-            color: #f39c12; /* Eri väri ennätykselle */
-            border: 2px solid red; /* Punainen reunus ennätykselle */
-            padding: 10px; /* Tilaa reunuksen sisällä */
-            border-radius: 5px; /* Kulmat pyöristetty */
+            border: 2px solid red; /* Punaiset reunukset */
+            padding: 10px; /* Lisää sisätilaa */
+            border-radius: 5px; /* Pyöristetyt kulmat */
         }
         .button {
             padding: 10px 20px;
@@ -84,6 +65,19 @@
             opacity: 1;
             transition: opacity 1s ease; /* Fade transition */
         }
+        .instructions {
+            display: none; /* Initially hidden */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 2px solid red; /* Punaiset reunukset */
+            border-radius: 5px;
+            z-index: 10; /* Varmista, että se on muiden päällä */
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -94,6 +88,12 @@
         <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!</div>
     </div>
     <button class="button" id="juomegista-button">Juomegistä</button>
+    <button class="button" id="instructions-button">Ohjeet</button>
+
+    <div class="instructions" id="instructions">
+        <p>Peli on kehitysvaiheessa. Pelin tekijä on ksppk.</p>
+        <button class="button" id="close-instructions">Sulje</button>
+    </div>
 
     <script>
         const container = document.getElementById("game-container");
@@ -101,23 +101,13 @@
         const highScoreElement = document.getElementById("high-score");
         const juomegistaButton = document.getElementById("juomegista-button");
         const notification = document.getElementById("notification");
+        const instructionsButton = document.getElementById("instructions-button");
+        const instructions = document.getElementById("instructions");
+        const closeInstructions = document.getElementById("close-instructions");
+
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
-        let highScore = localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0; // Haetaan ennätys localStoragesta
-
-        const tileImages = {
-            2: 'images/kuva2.png',
-            4: 'images/kuva4.png',
-            8: 'images/kuva8.png',
-            16: 'images/kuva16.png',
-            32: 'images/kuva32.png',
-            64: 'images/kuva64.png',
-            128: 'images/kuva128.png',
-            256: 'images/kuva256.png',
-            512: 'images/kuva512.png',
-            1024: 'images/kuva1024.png',
-            2048: 'images/kuva2048.png'
-        };
+        let highScore = 0; // Ennätys
 
         function addNewTile() {
             let emptyCells = [];
@@ -138,19 +128,11 @@
                 row.forEach(tile => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
-                    if (tile !== 0) {
-                        const img = document.createElement('img');
-                        img.src = tileImages[tile]; // Asetetaan kuva
-                        tileElement.appendChild(img);
-                        const numberElement = document.createElement('div');
-                        numberElement.className = 'tile-number';
-                        numberElement.textContent = tile; // Asetetaan numero kuvien alle
-                        tileElement.appendChild(numberElement);
-                    }
+                    tileElement.textContent = tile === 0 ? '' : tile;
                     container.appendChild(tileElement);
                 });
             });
-            highScoreElement.textContent = `Ennätys: ${highScore}`; // Näytetään ennätys
+            container.appendChild(notification); // Re-add notification after drawing board
         }
 
         function move(direction) {
@@ -172,10 +154,6 @@
                                 board[i][k] = 0;
                                 score += board[i][k - 1];  // Lisää pisteet
                                 moved = true;
-                                if (score > highScore) {
-                                    highScore = score; // Päivitetään ennätys
-                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
-                                }
                             }
                         }
                     }
@@ -198,10 +176,6 @@
                                 board[i][k] = 0;
                                 score += board[i][k + 1];  // Lisää pisteet
                                 moved = true;
-                                if (score > highScore) {
-                                    highScore = score; // Päivitetään ennätys
-                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
-                                }
                             }
                         }
                     }
@@ -224,10 +198,6 @@
                                 board[k][j] = 0;
                                 score += board[k - 1][j];  // Lisää pisteet
                                 moved = true;
-                                if (score > highScore) {
-                                    highScore = score; // Päivitetään ennätys
-                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
-                                }
                             }
                         }
                     }
@@ -250,10 +220,6 @@
                                 board[k][j] = 0;
                                 score += board[k + 1][j];  // Lisää pisteet
                                 moved = true;
-                                if (score > highScore) {
-                                    highScore = score; // Päivitetään ennätys
-                                    localStorage.setItem('highScore', highScore); // Tallennetaan ennätys localStorageen
-                                }
                             }
                         }
                     }
@@ -278,11 +244,18 @@
             if (moved) {
                 addNewTile();
                 drawBoard();
+                scoreElement.textContent = "Pisteet: " + score;
+
+                // Tarkista, onko uusi ennätys
+                if (score > highScore) {
+                    highScore = score;
+                    highScoreElement.textContent = "Ennätys: " + highScore;
+                }
             }
         }
 
-        function handleKeyPress(event) {
-            switch (event.key) {
+        window.addEventListener('keydown', (e) => {
+            switch (e.key) {
                 case 'ArrowLeft':
                     move('left');
                     break;
@@ -296,18 +269,27 @@
                     move('down');
                     break;
             }
-        }
-
-        document.addEventListener('keydown', handleKeyPress);
-        addNewTile(); // Lisätään uusi laatta alussa
-        drawBoard(); // Piirretään taulu alussa
+        });
 
         juomegistaButton.addEventListener('click', () => {
-            notification.style.display = 'block'; // Näytetään ilmoitus
-            setTimeout(() => {
-                notification.style.display = 'none'; // Piilotetaan ilmoitus
-            }, 2000);
+            if (score >= 1000) {
+                notification.style.display = 'block';
+            } else {
+                notification.style.display = 'none';
+            }
         });
+
+        instructionsButton.addEventListener('click', () => {
+            instructions.style.display = 'block';
+        });
+
+        closeInstructions.addEventListener('click', () => {
+            instructions.style.display = 'none';
+        });
+
+        addNewTile();
+        drawBoard();
     </script>
+
 </body>
 </html>
