@@ -10,16 +10,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             background-color: #faf8ef;
             font-family: Arial, sans-serif;
-            margin: 0; /* Poista oletus marginaali */
-            padding: 20px; /* Lisää tilaa puhelimilla */
-            box-sizing: border-box; /* Ota marginaalit ja padding huomioon */
         }
         .game-container {
-            width: 640px; /* Aseta leveys vakiona */
-            height: 640px; /* Aseta korkeus vakiona */
+            width: 640px;
+            height: 640px;
             background-color: #bbada0;
             border-radius: 10px;
             display: grid;
@@ -29,25 +26,29 @@
             position: relative;
         }
         .tile {
-            width: 100%; /* Laatikon leveys 100% */
-            height: 100%; /* Laatikon korkeus 100% */
+            width: 100%;
+            height: 100%;
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Lisätty pystysuora kohdistus */
             justify-content: center;
             align-items: center;
-            font-size: 32px; /* Suurennettu fonttikoko */
+            font-size: 24px;
             color: #776e65;
             transition: background-color 0.3s ease, transform 0.1s ease;
         }
         .score {
-            font-size: 32px; /* Suurennettu fonttikoko */
+            font-size: 24px;
             margin: 20px;
+        }
+        .high-score {
+            font-size: 24px;
+            margin: 20px;
+            color: #f39c12; /* Different color for high score */
         }
         .button {
             padding: 10px 20px;
-            font-size: 24px; /* Suurennettu fonttikoko */
+            font-size: 18px;
             margin-top: 20px;
             cursor: pointer;
         }
@@ -60,44 +61,18 @@
             color: white;
             text-align: center;
             padding: 10px;
-            display: none; /* Aluksi piilotettu */
+            display: none; /* Initially hidden */
             border-radius: 5px;
-            font-size: 24px; /* Suurennettu fonttikoko */
+            font-size: 18px;
             opacity: 1;
-            transition: opacity 1s ease; /* Häivytys */
-        }
-        .tile img {
-            width: 80%; /* Kuvan koko prosentteina */
-            height: auto; /* Ylläpidä kuvasuhde */
-        }
-        .tile-number {
-            font-size: 18px; /* Pienennä numeron kokoa */
-            color: #776e65;
-            margin-top: 5px; /* Vähän tilaa kuvan alle */
-        }
-
-        /* Media query pienemmille näytöille */
-        @media (max-width: 600px) {
-            .game-container {
-                width: 90vw; /* Aseta leveys suhteessa näkymän leveyteen */
-                height: auto; /* Muuta korkeus automaattiseksi */
-                aspect-ratio: 1; /* Pidä suhde 1:1 */
-            }
-            .tile {
-                font-size: 28px; /* Pienennä tekstin kokoa */
-            }
-            .score {
-                font-size: 28px; /* Pienennä pisteiden kokoa */
-            }
-            .button {
-                font-size: 20px; /* Pienennä napin kokoa */
-            }
+            transition: opacity 1s ease; /* Fade transition */
         }
     </style>
 </head>
 <body>
 
     <div class="score" id="score">Pisteet: 0</div>
+    <div class="high-score" id="high-score">Ennätys: 0</div>
     <div class="game-container" id="game-container">
         <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!</div>
     </div>
@@ -106,10 +81,12 @@
     <script>
         const container = document.getElementById("game-container");
         const scoreElement = document.getElementById("score");
+        const highScoreElement = document.getElementById("high-score");
         const juomegistaButton = document.getElementById("juomegista-button");
         const notification = document.getElementById("notification");
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
+        let highScore = 0; // Muuttuja ennätykselle
 
         function addNewTile() {
             let emptyCells = [];
@@ -130,18 +107,7 @@
                 row.forEach(tile => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
-                    
-                    if (tile !== 0) {
-                        const img = document.createElement('img');
-                        img.src = `images/${tile}.png`; // Kuvan lähde
-                        img.alt = tile; // Alt-teksti
-                        const numberElement = document.createElement('div');
-                        numberElement.className = 'tile-number';
-                        numberElement.textContent = tile; // Näytä numero kuvan alla
-                        tileElement.appendChild(img);
-                        tileElement.appendChild(numberElement);
-                    }
-                    
+                    tileElement.textContent = tile === 0 ? '' : tile;
                     container.appendChild(tileElement);
                 });
             });
@@ -251,6 +217,11 @@
                 addNewTile();
                 drawBoard();
                 scoreElement.textContent = `Pisteet: ${score}`;
+                // Päivitetään ennätys
+                if (score > highScore) {
+                    highScore = score;
+                    highScoreElement.textContent = `Ennätys: ${highScore}`;
+                }
             }
         }
 
