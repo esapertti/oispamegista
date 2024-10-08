@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 Peli</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #faf8ef;
+            font-family: Arial, sans-serif;
+        }
+        .game-container {
+            width: 400px;
+            height: 400px;
+            background-color: #bbada0;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        .tile {
+            width: 90px;
+            height: 90px;
+            background-color: #eee4da;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #776e65;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container" id="game-container"></div>
+    <script>
+        const container = document.getElementById("game-container");
+        let board = Array(4).fill().map(() => Array(4).fill(0));
+
+        function addNewTile() {
+            let emptyCells = [];
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (board[i][j] === 0) emptyCells.push({ x: i, y: j });
+                }
+            }
+            if (emptyCells.length) {
+                const { x, y } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                board[x][y] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function drawBoard() {
+            container.innerHTML = '';
+            board.forEach(row => {
+                row.forEach(tile => {
+                    const tileElement = document.createElement('div');
+                    tileElement.className = 'tile';
+                    tileElement.textContent = tile === 0 ? '' : tile;
+                    container.appendChild(tileElement);
+                });
+            });
+        }
+
+        function move(direction) {
+            let moved = false;
+            if (direction === 'left') {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 1; j < 4; j++) {
+                        if (board[i][j] !== 0) {
+                            let k = j;
+                            while (k > 0 && board[i][k - 1] === 0) {
+                                board[i][k - 1] = board[i][k];
+                                board[i][k] = 0;
+                                k--;
+                                moved = true;
+                            }
+                            if (k > 0 && board[i][k - 1] === board[i][k]) {
+                                board[i][k - 1] *= 2;
+                                board[i][k] = 0;
+                                moved = true;
+                            }
+                        }
+                    }
+                }
+            }
+            // Lisää oikealle, ylös ja alas liikkuminen...
+            if (moved) {
+                addNewTile();
+                drawBoard();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft': move('left'); break;
+                // Lisää ohjaimet oikealle, ylös ja alas...
+            }
+        });
+
+        function startGame() {
+            addNewTile();
+            addNewTile();
+            drawBoard();
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
