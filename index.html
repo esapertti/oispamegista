@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OisPamegista</title>
+    <title>Oispa megista</title>
     <style>
         body {
             display: flex;
@@ -23,11 +23,11 @@
         .game-container {
             width: 400px; /* Peliruudun leveys */
             height: 400px; /* Peliruudun korkeus */
-            background-color: #bbada0;
+            background-color: #bbada0; /* Taustaväri peliruudulle */
             border-radius: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 0; /* Poista väli peliruudun laattojen välistä */
             padding: 10px;
             position: relative;
         }
@@ -195,199 +195,66 @@
                     container.appendChild(tileElement);
                 });
             });
-            container.appendChild(notification); // Lisää ilmoitus uudelleen piirron jälkeen
-            container.appendChild(gameOverElement); // Lisää pelin häviöilmoitus uudelleen piirron jälkeen
+            container.appendChild(notification); // Varmista, että ilmoitus näkyy
+            scoreElement.textContent = `Pisteet: ${score}`;
+            highScoreElement.textContent = `Ennätys: ${highScore}`;
+        }
+
+        function move(direction) {
+            // Logiikka siirtää laattoja ja yhdistää niitä
+            // Tarvitaan implementointi täällä
         }
 
         function checkGameOver() {
             // Tarkista, onko peli päättynyt
-            const hasEmptyCell = board.some(row => row.includes(0));
-            const canCombine = board.some((row, i) => row.some((cell, j) => {
-                if (cell !== 0) {
-                    return (j < 3 && cell === row[j + 1]) || (i < 3 && cell === board[i + 1][j]);
-                }
-                return false;
-            }));
-            return !hasEmptyCell && !canCombine;
+            // Tarvitaan implementointi täällä
         }
 
-        function move(direction) {
-            let moved = false;
-
-            const moveLeft = () => {
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 1; j < 4; j++) {
-                        if (board[i][j] !== 0) {
-                            let k = j;
-                            while (k > 0 && board[i][k - 1] === 0) {
-                                board[i][k - 1] = board[i][k];
-                                board[i][k] = 0;
-                                k--;
-                                moved = true;
-                            }
-                            if (k > 0 && board[i][k - 1] === board[i][k]) {
-                                board[i][k - 1] *= 2;
-                                board[i][k] = 0;
-                                score += board[i][k - 1];  // Lisää pisteet
-                                moved = true;
-                            }
-                        }
-                    }
-                }
-            };
-
-            const moveRight = () => {
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 2; j >= 0; j--) {
-                        if (board[i][j] !== 0) {
-                            let k = j;
-                            while (k < 3 && board[i][k + 1] === 0) {
-                                board[i][k + 1] = board[i][k];
-                                board[i][k] = 0;
-                                k++;
-                                moved = true;
-                            }
-                            if (k < 3 && board[i][k + 1] === board[i][k]) {
-                                board[i][k + 1] *= 2;
-                                board[i][k] = 0;
-                                score += board[i][k + 1];  // Lisää pisteet
-                                moved = true;
-                            }
-                        }
-                    }
-                }
-            };
-
-            const moveUp = () => {
-                for (let j = 0; j < 4; j++) {
-                    for (let i = 1; i < 4; i++) {
-                        if (board[i][j] !== 0) {
-                            let k = i;
-                            while (k > 0 && board[k - 1][j] === 0) {
-                                board[k - 1][j] = board[k][j];
-                                board[k][j] = 0;
-                                k--;
-                                moved = true;
-                            }
-                            if (k > 0 && board[k - 1][j] === board[k][j]) {
-                                board[k - 1][j] *= 2;
-                                board[k][j] = 0;
-                                score += board[k - 1][j];  // Lisää pisteet
-                                moved = true;
-                            }
-                        }
-                    }
-                }
-            };
-
-            const moveDown = () => {
-                for (let j = 0; j < 4; j++) {
-                    for (let i = 2; i >= 0; i--) {
-                        if (board[i][j] !== 0) {
-                            let k = i;
-                            while (k < 3 && board[k + 1][j] === 0) {
-                                board[k + 1][j] = board[k][j];
-                                board[k][j] = 0;
-                                k++;
-                                moved = true;
-                            }
-                            if (k < 3 && board[k + 1][j] === board[k][j]) {
-                                board[k + 1][j] *= 2;
-                                board[k][j] = 0;
-                                score += board[k + 1][j];  // Lisää pisteet
-                                moved = true;
-                            }
-                        }
-                    }
-                }
-            };
-
-            switch (direction) {
-                case 'left':
-                    moveLeft();
-                    break;
-                case 'right':
-                    moveRight();
-                    break;
-                case 'up':
-                    moveUp();
-                    break;
-                case 'down':
-                    moveDown();
-                    break;
-            }
-
-            if (moved) {
-                addNewTile();
-                drawBoard();
-                updateScore();
-                if (checkGameOver()) {
-                    gameOverElement.style.display = 'block'; // Näytä häviöilmoitus
-                    restartButton.style.display = 'block'; // Näytä "Aloita alusta" -nappi
-                }
-            }
+        function resetGame() {
+            board = Array(4).fill().map(() => Array(4).fill(0));
+            score = 0;
+            addNewTile();
+            drawBoard();
         }
 
-        function updateScore() {
-            scoreElement.textContent = "Pisteet: " + score;
-            if (score > highScore) {
-                highScore = score;
-                highScoreElement.textContent = "Ennätys: " + highScore; // Päivitä ennätys
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp') {
+                move('up');
+            } else if (event.key === 'ArrowDown') {
+                move('down');
+            } else if (event.key === 'ArrowLeft') {
+                move('left');
+            } else if (event.key === 'ArrowRight') {
+                move('right');
             }
-        }
-
-        document.addEventListener("keydown", (event) => {
-            switch (event.key) {
-                case "ArrowLeft":
-                    move('left');
-                    break;
-                case "ArrowRight":
-                    move('right');
-                    break;
-                case "ArrowUp":
-                    move('up');
-                    break;
-                case "ArrowDown":
-                    move('down');
-                    break;
-            }
+            checkGameOver();
         });
 
-        juomegistaButton.addEventListener("click", () => {
+        juomegistaButton.addEventListener('click', () => {
             if (score >= 1000) {
-                alert("Juomegistä käytetty!"); // Lisää haluamasi toiminto
-                score -= 1000; // Vähennä pisteitä
-                updateScore();
+                // Tarjoa pelaajalle etuja
             } else {
                 notification.style.display = 'block'; // Näytä ilmoitus
                 setTimeout(() => {
-                    notification.style.display = 'none'; // Piilota ilmoitus 2 sekunnin kuluttua
-                }, 2000);
+                    notification.style.display = 'none'; // Piilota ilmoitus
+                }, 3000);
             }
         });
 
-        instructionsButton.addEventListener("click", () => {
+        instructionsButton.addEventListener('click', () => {
             instructions.style.display = 'block'; // Näytä ohjeet
         });
 
-        closeInstructions.addEventListener("click", () => {
+        closeInstructions.addEventListener('click', () => {
             instructions.style.display = 'none'; // Sulje ohjeet
         });
 
-        restartButton.addEventListener("click", () => {
-            // Nollaa peli
-            board = Array(4).fill().map(() => Array(4).fill(0));
-            score = 0;
-            gameOverElement.style.display = 'none'; // Piilota häviöilmoitus
-            restartButton.style.display = 'none'; // Piilota "Aloita alusta" -nappi
-            addNewTile();
-            drawBoard();
-            updateScore();
+        restartButton.addEventListener('click', () => {
+            resetGame();
+            restartButton.style.display = 'none'; // Piilota uudelleenaloitus-nappi
         });
 
-        // Lisää uusi laatta alussa
-        addNewTile();
-        drawBoard();
+        resetGame(); // Aloita peli
     </script>
 </body>
 </html>
