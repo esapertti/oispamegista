@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OisPamegista</title>
+    <title>Oispa megista</title>
     <style>
         body {
             display: flex;
@@ -32,21 +32,19 @@
             position: relative;
         }
         .tile {
-            width: 90px;
-            height: 90px;
+            width: 100%; /* Tee laatasta koko leveys */
+            height: 100%; /* Tee laatasta koko korkeus */
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Muutettu pystysuuntaiseksi */
             justify-content: center;
             align-items: center;
             transition: background-color 0.3s ease, transform 0.1s ease;
             position: relative; /* Sijainti suhteellinen */
         }
         .tile img {
-            max-width: 60px; /* Kuvan koko */
-            max-height: 60px; /* Kuvan korkeus */
-            margin-bottom: 5px; /* Tyhjää kuvien ja tekstin väliin */
+            max-width: 100%; /* Kuvan koko */
+            max-height: 100%; /* Kuvan korkeus */
         }
         .score, .high-score {
             font-size: 24px;
@@ -187,10 +185,6 @@
                         const img = document.createElement('img');
                         img.src = tileImages[tile] || 'images/default.png'; // Oletuskuva, jos kuvaa ei löydy
                         tileElement.appendChild(img);
-
-                        const sizeLabel = document.createElement('div');
-                        sizeLabel.textContent = tile; // Laatan koko
-                        tileElement.appendChild(sizeLabel);
                     }
                     container.appendChild(tileElement);
                 });
