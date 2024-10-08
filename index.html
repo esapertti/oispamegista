@@ -11,7 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white; /* Muutettu taustaväri valkoiseksi */
+            background-color: white; /* Taustaväri valkoiseksi */
             font-family: Arial, sans-serif;
         }
         .game-container {
@@ -31,7 +31,7 @@
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Lisätty, jotta kuva ja numero mahtuvat päällekkäin */
+            flex-direction: column; /* Kuvan ja numeron asettaminen päällekkäin */
             justify-content: center;
             align-items: center;
             position: relative;
@@ -150,7 +150,6 @@
                     container.appendChild(tileElement);
                 });
             });
-            container.appendChild(notification); // Re-add notification after drawing board
             highScoreElement.textContent = `Ennätys: ${highScore}`; // Näytetään ennätys
         }
 
