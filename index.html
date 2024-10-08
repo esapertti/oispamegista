@@ -16,6 +16,7 @@
             background-position: center; /* Keskittää taustan */
             font-family: Arial, sans-serif;
             position: relative;
+            margin: 0; /* Poista oletus marginaalit */
         }
         .header {
             display: flex;
@@ -213,7 +214,7 @@
                             (i < 3 && board[i][j] === board[i + 1][j]) || // Vertikaalinen yhdistäminen
                             (j < 3 && board[i][j] === board[i][j + 1]) // Horisontaalinen yhdistäminen
                         ) {
-                            return;
+                            return false; // Peli ei ole päättynyt
                         }
                     }
                 }
@@ -228,6 +229,7 @@
             let moved = false;
             const prevBoard = JSON.parse(JSON.stringify(board)); // Tallennetaan edellinen tila
 
+            // Liikuta palikoita ja yhdistä
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
                     if (board[i][j] !== 0) {
@@ -259,15 +261,16 @@
                                 }
                                 break;
                         }
+
                         // Yhdistä palikat
                         if (newI !== i || newJ !== j) {
                             if (board[newI][newJ] === board[i][j]) {
-                                board[newI][newJ] *= 2;
+                                board[newI][newJ] *= 2; // Yhdistetään palikat
                                 score += board[newI][newJ];
                                 board[i][j] = 0; // Tyhjennä alkuperäinen paikka
                                 moved = true;
                             } else if (board[newI][newJ] === 0) {
-                                board[newI][newJ] = board[i][j];
+                                board[newI][newJ] = board[i][j]; // Liikuta palikkaa
                                 board[i][j] = 0; // Tyhjennä alkuperäinen paikka
                                 moved = true;
                             }
@@ -340,4 +343,3 @@
     </script>
 </body>
 </html>
-
