@@ -10,13 +10,18 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #faf8ef;
             font-family: Arial, sans-serif;
+            margin: 0; /* Poista oletus marginaali */
+            padding: 20px; /* Lisää tilaa puhelimilla */
+            box-sizing: border-box; /* Ota marginaalit ja padding huomioon */
         }
         .game-container {
-            width: 400px;
-            height: 400px;
+            width: 90vw; /* Aseta leveys suhteessa näkymän leveyteen */
+            max-width: 500px; /* Aseta maksimi leveys */
+            height: 90vw; /* Aseta korkeus suhteessa näkymän leveyteen */
+            max-height: 500px; /* Aseta maksimi korkeus */
             background-color: #bbada0;
             border-radius: 10px;
             display: grid;
@@ -26,12 +31,12 @@
             position: relative;
         }
         .tile {
-            width: 90px;
-            height: 90px;
+            width: 100%; /* Laatikon leveys 100% */
+            height: 100%; /* Laatikon korkeus 100% */
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Added for vertical alignment */
+            flex-direction: column; /* Lisätty pystysuora kohdistus */
             justify-content: center;
             align-items: center;
             font-size: 24px;
@@ -57,20 +62,33 @@
             color: white;
             text-align: center;
             padding: 10px;
-            display: none; /* Initially hidden */
+            display: none; /* Aluksi piilotettu */
             border-radius: 5px;
             font-size: 18px;
             opacity: 1;
-            transition: opacity 1s ease; /* Fade transition */
+            transition: opacity 1s ease; /* Häivytys */
         }
         .tile img {
-            width: 60px; /* Kuvan koko */
-            height: 60px; /* Kuvan koko */
+            width: 80%; /* Kuvan koko prosentteina */
+            height: auto; /* Ylläpidä kuvasuhde */
         }
         .tile-number {
-            font-size: 12px; /* Pienennä numeron kokoa */
+            font-size: 14px; /* Pienennä numeron kokoa */
             color: #776e65;
             margin-top: 5px; /* Vähän tilaa kuvan alle */
+        }
+
+        /* Media query pienemmille näytöille */
+        @media (max-width: 600px) {
+            .tile {
+                font-size: 20px; /* Pienennä tekstin kokoa */
+            }
+            .score {
+                font-size: 20px; /* Pienennä pisteiden kokoa */
+            }
+            .button {
+                font-size: 16px; /* Pienennä napin kokoa */
+            }
         }
     </style>
 </head>
