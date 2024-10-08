@@ -59,6 +59,8 @@
             display: none; /* Initially hidden */
             border-radius: 5px;
             font-size: 18px;
+            opacity: 1;
+            transition: opacity 1s ease; /* Fade transition */
         }
     </style>
 </head>
@@ -219,6 +221,13 @@
                 notification.style.display = 'none'; // Piilota ilmoitus
             } else {
                 notification.style.display = 'block'; // Näytä ilmoitus
+                setTimeout(() => {
+                    notification.style.opacity = '0'; // Fade out
+                    setTimeout(() => {
+                        notification.style.display = 'none'; // Piilota ilmoitus
+                        notification.style.opacity = '1'; // Reset opacity
+                    }, 1000); // 1 sekunnin kuluttua, kun fade out on valmis
+                }, 5000); // Näytä 5 sekunnin kuluttua
             }
         }
 
@@ -233,13 +242,11 @@
 
         juomegistaButton.addEventListener('click', removeLowTiles);
 
-        function startGame() {
-            addNewTile();
-            addNewTile();
-            drawBoard();
-        }
-
-        startGame();
+        // Alustetaan peli
+        addNewTile();
+        addNewTile();
+        drawBoard();
     </script>
+
 </body>
 </html>
