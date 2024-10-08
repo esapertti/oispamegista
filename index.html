@@ -40,7 +40,7 @@
             flex-direction: column; /* Muutettu pystysuuntaiseksi */
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Transition lisätty */
             position: relative; /* Sijainti suhteellinen */
         }
         .tile img {
@@ -225,7 +225,7 @@
 
             const moveTiles = (line) => {
                 const newLine = mergeTiles(line.filter(tile => tile !== 0));
-                return direction === 'left' ? newLine : newLine.reverse();
+                return direction === 'left' || direction === 'up' ? newLine : newLine.reverse();
             };
 
             switch (direction) {
