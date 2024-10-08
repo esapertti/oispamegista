@@ -31,19 +31,11 @@
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Align items vertically */
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-        }
-        .tile img {
-            width: 60%; /* Control image size */
-            height: auto;
-        }
-        .tile-number {
-            font-size: 14px; /* Control font size */
+            font-size: 24px;
             color: #776e65;
-            margin-top: 5px; /* Add margin between image and text */
+            transition: background-color 0.3s ease, transform 0.1s ease;
         }
         .score {
             font-size: 24px;
@@ -107,18 +99,7 @@
                 row.forEach(tile => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
-
-                    if (tile !== 0) {
-                        const img = document.createElement('img');
-                        img.src = `images/${tile}.png`; // Linkki kuvaan
-                        tileElement.appendChild(img);
-
-                        const tileNumber = document.createElement('div');
-                        tileNumber.className = 'tile-number';
-                        tileNumber.textContent = tile;
-                        tileElement.appendChild(tileNumber);
-                    }
-
+                    tileElement.textContent = tile === 0 ? '' : tile;
                     container.appendChild(tileElement);
                 });
             });
@@ -219,4 +200,54 @@
             // Suorita liikettä riippuen suunnasta
             switch (direction) {
                 case 'left': moveLeft(); break;
-                case 'right':
+                case 'right': moveRight(); break;
+                case 'up': moveUp(); break;
+                case 'down': moveDown(); break;
+            }
+
+            if (moved) {
+                addNewTile();
+                drawBoard();
+                scoreElement.textContent = `Pisteet: ${score}`;
+            }
+        }
+
+        function removeLowTiles() {
+            if (score >= 1000) {
+                board = board.map(row => row.map(tile => (tile < 16 ? 0 : tile)));
+                score -= 1000; // Vähennä pisteet
+                scoreElement.textContent = `Pisteet: ${score}`;
+                drawBoard();
+                notification.style.display = 'none'; // Piilota ilmoitus
+            } else {
+                notification.style.display = 'block'; // Näytä ilmoitus
+                setTimeout(() => {
+                    notification.style.opacity = '0'; // Fade out
+                    setTimeout(() => {
+                        notification.style.display = 'none'; // Piilota ilmoitus
+                        notification.style.opacity = '1'; // Reset opacity
+                    }, 1000); // 1 sekunnin kuluttua, kun fade out on valmis
+                }, 5000); // Näytä 5 sekunnin kuluttua
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft': move('left'); break;
+                case 'ArrowRight': move('right'); break;
+                case 'ArrowUp': move('up'); break;
+                case 'ArrowDown': move('down'); break;
+            }
+        });
+
+        juomegistaButton.addEventListener('click', removeLowTiles);
+
+        // Alustetaan peli
+        addNewTile();
+        addNewTile();
+        drawBoard();
+    </script>
+
+</body>
+</html>
+
