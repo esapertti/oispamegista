@@ -11,24 +11,28 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white;
+            background-image: url('taustakuva.png'); /* Taustakuva */
+            background-size: cover; /* Peittää koko taustan */
+            background-position: center; /* Keskittää taustan */
             font-family: Arial, sans-serif;
+            position: relative;
         }
         .header {
             display: flex;
             justify-content: space-between;
-            width: 400px;
+            width: 400px; /* Oletus leveys */
             margin-bottom: 20px;
         }
         .game-container {
-            width: 400px;
-            height: 400px;
-            background-color: #bbada0;
+            width: 400px; /* Peliruudun leveys */
+            height: 400px; /* Peliruudun korkeus */
+            background-color: rgba(187, 173, 160, 0.8); /* Tausta läpinäkyvä */
             border-radius: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             padding: 10px;
+            position: relative;
         }
         .tile {
             width: 90px;
@@ -36,23 +40,24 @@
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Muutettu pystysuuntaiseksi */
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Lisätty transition */
+            position: absolute; /* Asetettu absoluuttinen sijainti */
         }
         .tile img {
-            max-width: 60px;
-            max-height: 60px;
+            max-width: 60px; /* Kuvan koko */
+            max-height: 60px; /* Kuvan korkeus */
+            margin-bottom: 5px; /* Tyhjää kuvien ja tekstin väliin */
         }
         .score, .high-score {
             font-size: 24px;
-            border: 2px solid red;
-            padding: 10px;
-            border-radius: 5px;
+            border: 2px solid red; /* Punaiset reunukset */
+            padding: 10px; /* Lisää sisätilaa */
+            border-radius: 5px; /* Pyöristetyt kulmat */
             text-align: center;
-            margin: 0;
+            margin: 0; /* Poista marginaali */
         }
         .button {
             padding: 10px 20px;
@@ -68,21 +73,23 @@
             color: white;
             text-align: center;
             padding: 10px;
-            display: none;
+            display: none; /* Alkuperäisesti piilotettu */
             border-radius: 5px;
             font-size: 18px;
+            opacity: 1;
+            transition: opacity 1s ease; /* Fade transition */
         }
         .instructions {
-            display: none;
+            display: none; /* Alkuperäisesti piilotettu */
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
-            border: 2px solid red;
+            border: 2px solid red; /* Punaiset reunukset */
             border-radius: 5px;
-            z-index: 10;
+            z-index: 10; /* Varmista, että se on muiden päällä */
             text-align: center;
         }
         .game-over {
@@ -91,13 +98,13 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: red;
-            font-size: 96px;
+            font-size: 96px; /* Kaksinkertainen koko */
             font-weight: bold;
             text-align: center;
-            display: none;
+            display: none; /* Alkuperäisesti piilotettu */
         }
         .restart-button {
-            display: none;
+            display: none; /* Alkuperäisesti piilotettu */
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 18px;
@@ -112,12 +119,15 @@
         <div class="high-score" id="high-score">Ennätys: 0</div>
     </div>
     
-    <div class="game-container" id="game-container"></div>
+    <div class="game-container" id="game-container">
+        <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Aamumegistä!</div>
+        <div class="game-over" id="game-over">:DD</div> <!-- Pelin häviöilmoitus -->
+    </div>
 
-    <button class="button restart-button" id="restart-button">Aloita alusta</button>
+    <button class="button restart-button" id="restart-button">Aloita alusta</button> <!-- Aloita alusta -nappi -->
     
     <div class="header">
-        <button class="button" id="juomegista-button">Juomegistä</button>
+        <button class="button" id="aamumegista-button">Aamumegistä</button>
         <button class="button" id="instructions-button">Ohjeet</button>
     </div>
 
@@ -130,7 +140,7 @@
         const container = document.getElementById("game-container");
         const scoreElement = document.getElementById("score");
         const highScoreElement = document.getElementById("high-score");
-        const juomegistaButton = document.getElementById("juomegista-button");
+        const aamumegistaButton = document.getElementById("aamumegista-button");
         const notification = document.getElementById("notification");
         const instructionsButton = document.getElementById("instructions-button");
         const instructions = document.getElementById("instructions");
@@ -140,9 +150,9 @@
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
-        let highScore = 0;
+        let highScore = 0; // Ennätys
 
-        // Kuvien polut
+        // Kuvien polut (muokkaa näitä polkuja tarpeen mukaan)
         const tileImages = {
             2: 'images/2.png',
             4: 'images/4.png',
@@ -176,87 +186,158 @@
                 row.forEach((tile, colIndex) => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
+                    tileElement.style.transform = `translate(${colIndex * 100}%, ${rowIndex * 100}%)`; // Siirretään palikka oikeaan paikkaan
                     if (tile !== 0) {
                         const img = document.createElement('img');
-                        img.src = tileImages[tile];  // Näytä oikea kuva laatalle
+                        img.src = tileImages[tile] || 'images/default.png'; // Oletuskuva, jos kuvaa ei löydy
                         tileElement.appendChild(img);
-                    } else {
-                        tileElement.style.backgroundColor = '#ccc0b3';
+
+                        const sizeLabel = document.createElement('div');
+                        sizeLabel.textContent = tile; // Laatan koko
+                        tileElement.appendChild(sizeLabel);
                     }
                     container.appendChild(tileElement);
                 });
             });
+            container.appendChild(notification); // Lisää ilmoitus uudelleen piirron jälkeen
+            container.appendChild(gameOverElement); // Lisää pelin häviöilmoitus uudelleen piirron jälkeen
         }
 
-        function combineTiles(row) {
-            let newRow = row.slice(); // Kopioi rivi
-            for (let i = 0; i < 3; i++) {
-                if (newRow[i] !== 0 && newRow[i] === newRow[i + 1]) {
-                    newRow[i] *= 2;
-                    score += newRow[i];
-                    newRow[i + 1] = 0; // Nollaa yhdistetty palikka
-                }
-            }
-            return newRow.filter(tile => tile !== 0).concat(Array(4).fill(0).slice(newRow.filter(tile => tile !== 0).length));
-        }
-
-        function move(direction) {
-            let moved = false;
-            if (direction === 'up' || direction === 'down') {
-                for (let col = 0; col < 4; col++) {
-                    let column = board.map(row => row[col]);
-                    if (direction === 'down') column.reverse();
-                    let combined = combineTiles(column);
-                    if (direction === 'down') combined.reverse();
-                    for (let row = 0; row < 4; row++) {
-                        if (board[row][col] !== combined[row]) moved = true;
-                        board[row][col] = combined[row];
+        function checkGameOver() {
+            // Tarkista, onko peli päättynyt
+            const hasEmptyCell = board.some(row => row.includes(0));
+            if (!hasEmptyCell) {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        if (
+                            (i < 3 && board[i][j] === board[i + 1][j]) || // Vertikaalinen yhdistäminen
+                            (j < 3 && board[i][j] === board[i][j + 1]) // Horisontaalinen yhdistäminen
+                        ) {
+                            return;
+                        }
                     }
                 }
-            } else if (direction === 'left' || direction === 'right') {
-                for (let row = 0; row < 4; row++) {
-                    let currentRow = [...board[row]];
-                    if (direction === 'right') currentRow.reverse();
-                    let combined = combineTiles(currentRow);
-                    if (direction === 'right') combined.reverse();
-                    if (board[row].join('') !== combined.join('')) moved = true;
-                    board[row] = combined;
+                // Jos tyhjää ei ole ja ei voi yhdistää, peli on päättynyt
+                gameOverElement.style.display = 'block';
+                return true; // Peli loppui
+            }
+            return false; // Peli ei ole ohi
+        }
+
+        function moveTiles(direction) {
+            let moved = false;
+            const prevBoard = JSON.parse(JSON.stringify(board)); // Tallennetaan edellinen tila
+
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (board[i][j] !== 0) {
+                        let [newI, newJ] = [i, j];
+                        // Liikuta valittuun suuntaan
+                        switch (direction) {
+                            case 'up':
+                                while (newI > 0 && board[newI - 1][newJ] === 0) {
+                                    newI--;
+                                    moved = true;
+                                }
+                                break;
+                            case 'down':
+                                while (newI < 3 && board[newI + 1][newJ] === 0) {
+                                    newI++;
+                                    moved = true;
+                                }
+                                break;
+                            case 'left':
+                                while (newJ > 0 && board[newI][newJ - 1] === 0) {
+                                    newJ--;
+                                    moved = true;
+                                }
+                                break;
+                            case 'right':
+                                while (newJ < 3 && board[newI][newJ + 1] === 0) {
+                                    newJ++;
+                                    moved = true;
+                                }
+                                break;
+                        }
+                        // Yhdistä palikat
+                        if (newI !== i || newJ !== j) {
+                            if (board[newI][newJ] === board[i][j]) {
+                                board[newI][newJ] *= 2;
+                                score += board[newI][newJ];
+                                board[i][j] = 0; // Tyhjennä alkuperäinen paikka
+                                moved = true;
+                            } else if (board[newI][newJ] === 0) {
+                                board[newI][newJ] = board[i][j];
+                                board[i][j] = 0; // Tyhjennä alkuperäinen paikka
+                                moved = true;
+                            }
+                        }
+                    }
                 }
             }
+
+            // Tarkista, onko peli päättynyt
             if (moved) {
                 addNewTile();
                 drawBoard();
-                scoreElement.textContent = `Pisteet: ${score}`;
+                if (checkGameOver()) {
+                    gameOverElement.style.display = 'block'; // Näytä häviöilmoitus
+                }
+                scoreElement.textContent = 'Pisteet: ' + score;
                 if (score > highScore) {
-                    highScore = score;
-                    highScoreElement.textContent = `Ennätys: ${highScore}`;
+                    highScore = score; // Päivitä ennätys
+                    highScoreElement.textContent = 'Ennätys: ' + highScore;
                 }
             }
         }
 
-        document.addEventListener('keydown', (event) => {
-            switch (event.key) {
-                case 'ArrowUp': move('up'); break;
-                case 'ArrowDown': move('down'); break;
-                case 'ArrowLeft': move('left'); break;
-                case 'ArrowRight': move('right'); break;
-            }
-        });
-
-        restartButton.addEventListener('click', restartGame);
-
-        function restartGame() {
+        function resetGame() {
             board = Array(4).fill().map(() => Array(4).fill(0));
             score = 0;
             scoreElement.textContent = 'Pisteet: 0';
+            gameOverElement.style.display = 'none'; // Piilota häviöilmoitus
+            addNewTile();
+            addNewTile();
             drawBoard();
-            addNewTile();
-            addNewTile();
         }
 
-        addNewTile();
-        addNewTile();
-        drawBoard();
+        // Ohjaus näppäimillä
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp') {
+                moveTiles('up');
+            } else if (event.key === 'ArrowDown') {
+                moveTiles('down');
+            } else if (event.key === 'ArrowLeft') {
+                moveTiles('left');
+            } else if (event.key === 'ArrowRight') {
+                moveTiles('right');
+            }
+        });
+
+        aamumegistaButton.addEventListener('click', () => {
+            if (score >= 1000) {
+                alert("Aamumegistä on aktivoitu!");
+            } else {
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        instructionsButton.addEventListener('click', () => {
+            instructions.style.display = 'block';
+        });
+
+        closeInstructions.addEventListener('click', () => {
+            instructions.style.display = 'none';
+        });
+
+        restartButton.addEventListener('click', resetGame);
+
+        // Aloita peli
+        resetGame();
     </script>
 </body>
 </html>
+
