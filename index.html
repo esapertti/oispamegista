@@ -31,6 +31,7 @@
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
+            flex-direction: column; /* Added for vertical alignment */
             justify-content: center;
             align-items: center;
             font-size: 24px;
@@ -61,6 +62,15 @@
             font-size: 18px;
             opacity: 1;
             transition: opacity 1s ease; /* Fade transition */
+        }
+        .tile img {
+            width: 60px; /* Kuvan koko */
+            height: 60px; /* Kuvan koko */
+        }
+        .tile-number {
+            font-size: 12px; /* Pienennä numeron kokoa */
+            color: #776e65;
+            margin-top: 5px; /* Vähän tilaa kuvan alle */
         }
     </style>
 </head>
@@ -99,7 +109,18 @@
                 row.forEach(tile => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
-                    tileElement.textContent = tile === 0 ? '' : tile;
+                    
+                    if (tile !== 0) {
+                        const img = document.createElement('img');
+                        img.src = `images/${tile}.png`; // Kuvan lähde
+                        img.alt = tile; // Alt-teksti
+                        const numberElement = document.createElement('div');
+                        numberElement.className = 'tile-number';
+                        numberElement.textContent = tile; // Näytä numero kuvan alla
+                        tileElement.appendChild(img);
+                        tileElement.appendChild(numberElement);
+                    }
+                    
                     container.appendChild(tileElement);
                 });
             });
@@ -250,4 +271,3 @@
 
 </body>
 </html>
-
