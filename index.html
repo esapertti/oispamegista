@@ -33,6 +33,7 @@
             align-items: center;
             font-size: 24px;
             color: #776e65;
+            transition: background-color 0.3s ease, transform 0.1s ease;
         }
     </style>
 </head>
@@ -70,7 +71,9 @@
 
         function move(direction) {
             let moved = false;
-            if (direction === 'left') {
+
+            // Define movement functions
+            const moveLeft = () => {
                 for (let i = 0; i < 4; i++) {
                     for (let j = 1; j < 4; j++) {
                         if (board[i][j] !== 0) {
@@ -89,8 +92,79 @@
                         }
                     }
                 }
+            };
+
+            const moveRight = () => {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 2; j >= 0; j--) {
+                        if (board[i][j] !== 0) {
+                            let k = j;
+                            while (k < 3 && board[i][k + 1] === 0) {
+                                board[i][k + 1] = board[i][k];
+                                board[i][k] = 0;
+                                k++;
+                                moved = true;
+                            }
+                            if (k < 3 && board[i][k + 1] === board[i][k]) {
+                                board[i][k + 1] *= 2;
+                                board[i][k] = 0;
+                                moved = true;
+                            }
+                        }
+                    }
+                }
+            };
+
+            const moveUp = () => {
+                for (let j = 0; j < 4; j++) {
+                    for (let i = 1; i < 4; i++) {
+                        if (board[i][j] !== 0) {
+                            let k = i;
+                            while (k > 0 && board[k - 1][j] === 0) {
+                                board[k - 1][j] = board[k][j];
+                                board[k][j] = 0;
+                                k--;
+                                moved = true;
+                            }
+                            if (k > 0 && board[k - 1][j] === board[k][j]) {
+                                board[k - 1][j] *= 2;
+                                board[k][j] = 0;
+                                moved = true;
+                            }
+                        }
+                    }
+                }
+            };
+
+            const moveDown = () => {
+                for (let j = 0; j < 4; j++) {
+                    for (let i = 2; i >= 0; i--) {
+                        if (board[i][j] !== 0) {
+                            let k = i;
+                            while (k < 3 && board[k + 1][j] === 0) {
+                                board[k + 1][j] = board[k][j];
+                                board[k][j] = 0;
+                                k++;
+                                moved = true;
+                            }
+                            if (k < 3 && board[k + 1][j] === board[k][j]) {
+                                board[k + 1][j] *= 2;
+                                board[k][j] = 0;
+                                moved = true;
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Suorita liikettä riippuen suunnasta
+            switch (direction) {
+                case 'left': moveLeft(); break;
+                case 'right': moveRight(); break;
+                case 'up': moveUp(); break;
+                case 'down': moveDown(); break;
             }
-            // Lisää oikealle, ylös ja alas liikkuminen...
+
             if (moved) {
                 addNewTile();
                 drawBoard();
@@ -100,7 +174,9 @@
         document.addEventListener('keydown', (e) => {
             switch (e.key) {
                 case 'ArrowLeft': move('left'); break;
-                // Lisää ohjaimet oikealle, ylös ja alas...
+                case 'ArrowRight': move('right'); break;
+                case 'ArrowUp': move('up'); break;
+                case 'ArrowDown': move('down'); break;
             }
         });
 
