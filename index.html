@@ -285,9 +285,16 @@
 
         juomegistaButton.addEventListener('click', () => {
             if (score >= 1000) {
-                notification.style.display = 'block';
+                score -= 1000; // Vähennetään 1000 pistettä
+                scoreElement.textContent = "Pisteet: " + score; // Päivitetään pistetiedot
+                removeLowTiles(); // Poistetaan kaikki ruudut, joiden arvot ovat alle 16
+                drawBoard(); // Piirretään pelilauta uudelleen
             } else {
-                notification.style.display = 'none';
+                // Jos pisteitä on liian vähän, näytetään ilmoitus
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none'; // Piilotetaan ilmoitus 3 sekunnin kuluttua
+                }, 3000);
             }
         });
 
@@ -298,6 +305,16 @@
         closeInstructions.addEventListener('click', () => {
             instructions.style.display = 'none';
         });
+
+        function removeLowTiles() {
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (board[i][j] < 16) {
+                        board[i][j] = 0; // Aseta alle 16 arvot nollaksi
+                    }
+                }
+            }
+        }
 
         addNewTile();
         drawBoard();
