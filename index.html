@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa megista</title>
+    <title>OisPamegista</title>
     <style>
         body {
             display: flex;
@@ -89,6 +89,17 @@
             z-index: 10; /* Varmista, että se on muiden päällä */
             text-align: center;
         }
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: red;
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            display: none; /* Alkuperäisesti piilotettu */
+        }
     </style>
 </head>
 <body>
@@ -100,6 +111,7 @@
     
     <div class="game-container" id="game-container">
         <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!</div>
+        <div class="game-over" id="game-over">HAHAHA LUUSERI HÄVIS!!!!!</div> <!-- Pelin häviöilmoitus -->
     </div>
     
     <div class="header">
@@ -121,6 +133,7 @@
         const instructionsButton = document.getElementById("instructions-button");
         const instructions = document.getElementById("instructions");
         const closeInstructions = document.getElementById("close-instructions");
+        const gameOverElement = document.getElementById("game-over");
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
@@ -173,6 +186,19 @@
                 });
             });
             container.appendChild(notification); // Lisää ilmoitus uudelleen piirron jälkeen
+            container.appendChild(gameOverElement); // Lisää pelin häviöilmoitus uudelleen piirron jälkeen
+        }
+
+        function checkGameOver() {
+            // Tarkista, onko peli päättynyt
+            const hasEmptyCell = board.some(row => row.includes(0));
+            const canCombine = board.some((row, i) => row.some((cell, j) => {
+                if (cell !== 0) {
+                    return (j < 3 && cell === row[j + 1]) || (i < 3 && cell === board[i + 1][j]);
+                }
+                return false;
+            }));
+            return !hasEmptyCell && !canCombine;
         }
 
         function move(direction) {
@@ -285,6 +311,9 @@
                 addNewTile();
                 drawBoard();
                 updateScore();
+                if (checkGameOver()) {
+                    gameOverElement.style.display = 'block'; // Näytä häviöilmoitus
+                }
             }
         }
 
