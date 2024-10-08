@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2048 Peli</title>
+    <title>OisPamegista</title>
     <style>
         body {
             display: flex;
@@ -11,8 +11,14 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white; /* Vaihda tausta valkoiseksi */
+            background-color: white; /* Tausta valkoiseksi */
             font-family: Arial, sans-serif;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 400px; /* Oletus leveys */
+            margin-bottom: 20px;
         }
         .game-container {
             width: 400px; /* Peliruudun leveys */
@@ -39,15 +45,15 @@
         }
         .score, .high-score {
             font-size: 24px;
-            margin: 20px;
             border: 2px solid red; /* Punaiset reunukset */
             padding: 10px; /* Lisää sisätilaa */
             border-radius: 5px; /* Pyöristetyt kulmat */
+            text-align: center;
+            margin: 0; /* Poista marginaali */
         }
         .button {
             padding: 10px 20px;
             font-size: 18px;
-            margin-top: 20px;
             cursor: pointer;
         }
         .notification {
@@ -59,14 +65,14 @@
             color: white;
             text-align: center;
             padding: 10px;
-            display: none; /* Initially hidden */
+            display: none; /* Alkuperäisesti piilotettu */
             border-radius: 5px;
             font-size: 18px;
             opacity: 1;
             transition: opacity 1s ease; /* Fade transition */
         }
         .instructions {
-            display: none; /* Initially hidden */
+            display: none; /* Alkuperäisesti piilotettu */
             position: absolute;
             top: 50%;
             left: 50%;
@@ -82,13 +88,19 @@
 </head>
 <body>
 
-    <div class="score" id="score">Pisteet: 0</div>
-    <div class="high-score" id="high-score">Ennätys: 0</div>
+    <div class="header">
+        <div class="score" id="score">Pisteet: 0</div>
+        <div class="high-score" id="high-score">Ennätys: 0</div>
+    </div>
+    
     <div class="game-container" id="game-container">
         <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!</div>
     </div>
-    <button class="button" id="juomegista-button">Juomegistä</button>
-    <button class="button" id="instructions-button">Ohjeet</button>
+    
+    <div class="header">
+        <button class="button" id="juomegista-button">Juomegistä</button>
+        <button class="button" id="instructions-button">Ohjeet</button>
+    </div>
 
     <div class="instructions" id="instructions">
         <p>Peli on kehitysvaiheessa. Pelin tekijä on ksppk.</p>
@@ -132,7 +144,7 @@
                     container.appendChild(tileElement);
                 });
             });
-            container.appendChild(notification); // Re-add notification after drawing board
+            container.appendChild(notification); // Lisää ilmoitus uudelleen piirron jälkeen
         }
 
         function move(direction) {
