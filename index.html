@@ -23,6 +23,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             padding: 10px;
+            position: relative;
         }
         .tile {
             width: 90px;
@@ -46,20 +47,34 @@
             margin-top: 20px;
             cursor: pointer;
         }
+        .notification {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            display: none; /* Initially hidden */
+            border-radius: 5px;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
 
     <div class="score" id="score">Pisteet: 0</div>
-    <div class="game-container" id="game-container"></div>
-    <button class="button" id="remove-tile-button">Poista 10 pistettä</button>
+    <div class="game-container" id="game-container">
+        <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!</div>
+    </div>
     <button class="button" id="juomegista-button">Juomegistä</button>
 
     <script>
         const container = document.getElementById("game-container");
         const scoreElement = document.getElementById("score");
-        const removeTileButton = document.getElementById("remove-tile-button");
         const juomegistaButton = document.getElementById("juomegista-button");
+        const notification = document.getElementById("notification");
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
 
@@ -86,6 +101,7 @@
                     container.appendChild(tileElement);
                 });
             });
+            container.appendChild(notification); // Re-add notification after drawing board
         }
 
         function move(direction) {
@@ -200,8 +216,9 @@
                 score -= 1000; // Vähennä pisteet
                 scoreElement.textContent = `Pisteet: ${score}`;
                 drawBoard();
+                notification.style.display = 'none'; // Piilota ilmoitus
             } else {
-                alert("Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!");
+                notification.style.display = 'block'; // Näytä ilmoitus
             }
         }
 
@@ -211,15 +228,6 @@
                 case 'ArrowRight': move('right'); break;
                 case 'ArrowUp': move('up'); break;
                 case 'ArrowDown': move('down'); break;
-            }
-        });
-
-        removeTileButton.addEventListener('click', () => {
-            if (score >= 10) {
-                score -= 10;
-                scoreElement.textContent = `Pisteet: ${score}`;
-            } else {
-                alert("Ei tarpeeksi pisteitä poistaaksesi 10 pistettä!");
             }
         });
 
