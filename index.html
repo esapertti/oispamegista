@@ -189,14 +189,15 @@
         }
 
         function combineTiles(row) {
+            let newRow = row.slice(); // Kopioi rivi
             for (let i = 0; i < 3; i++) {
-                if (row[i] !== 0 && row[i] === row[i + 1]) {
-                    row[i] *= 2;
-                    score += row[i];
-                    row[i + 1] = 0;
+                if (newRow[i] !== 0 && newRow[i] === newRow[i + 1]) {
+                    newRow[i] *= 2;
+                    score += newRow[i];
+                    newRow[i + 1] = 0; // Nollaa yhdistetty palikka
                 }
             }
-            return row.filter(tile => tile !== 0).concat(Array(4).fill(0).slice(row.filter(tile => tile !== 0).length));
+            return newRow.filter(tile => tile !== 0).concat(Array(4).fill(0).slice(newRow.filter(tile => tile !== 0).length));
         }
 
         function move(direction) {
