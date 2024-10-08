@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa megista</title>
+    <title>OisPamegista</title>
     <style>
         body {
             display: flex;
@@ -11,18 +11,18 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white; /* Tausta valkoiseksi */
+            background-color: white;
             font-family: Arial, sans-serif;
         }
         .header {
             display: flex;
             justify-content: space-between;
-            width: 400px; /* Oletus leveys */
+            width: 400px;
             margin-bottom: 20px;
         }
         .game-container {
-            width: 400px; /* Peliruudun leveys */
-            height: 400px; /* Peliruudun korkeus */
+            width: 400px;
+            height: 400px;
             background-color: #bbada0;
             border-radius: 10px;
             display: grid;
@@ -37,24 +37,25 @@
             background-color: #eee4da;
             border-radius: 5px;
             display: flex;
-            flex-direction: column; /* Muutettu pystysuuntaiseksi */
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Transition lisätty */
-            position: relative; /* Sijainti suhteellinen */
+            font-size: 24px;
+            font-weight: bold;
+            transition: transform 0.3s ease; /* Smooth transition added */
+            position: relative;
         }
         .tile img {
-            max-width: 60px; /* Kuvan koko */
-            max-height: 60px; /* Kuvan korkeus */
-            margin-bottom: 5px; /* Tyhjää kuvien ja tekstin väliin */
+            max-width: 60px;
+            max-height: 60px;
+            margin-bottom: 5px;
         }
         .score, .high-score {
             font-size: 24px;
-            border: 2px solid red; /* Punaiset reunukset */
-            padding: 10px; /* Lisää sisätilaa */
-            border-radius: 5px; /* Pyöristetyt kulmat */
+            border: 2px solid red;
+            padding: 10px;
+            border-radius: 5px;
             text-align: center;
-            margin: 0; /* Poista marginaali */
+            margin: 0;
         }
         .button {
             padding: 10px 20px;
@@ -70,24 +71,11 @@
             color: white;
             text-align: center;
             padding: 10px;
-            display: none; /* Alkuperäisesti piilotettu */
+            display: none;
             border-radius: 5px;
             font-size: 18px;
             opacity: 1;
-            transition: opacity 1s ease; /* Fade transition */
-        }
-        .instructions {
-            display: none; /* Alkuperäisesti piilotettu */
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border: 2px solid red; /* Punaiset reunukset */
-            border-radius: 5px;
-            z-index: 10; /* Varmista, että se on muiden päällä */
-            text-align: center;
+            transition: opacity 1s ease;
         }
         .game-over {
             position: absolute;
@@ -95,13 +83,13 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: red;
-            font-size: 96px; /* Kaksinkertainen koko */
+            font-size: 96px;
             font-weight: bold;
             text-align: center;
-            display: none; /* Alkuperäisesti piilotettu */
+            display: none;
         }
         .restart-button {
-            display: none; /* Alkuperäisesti piilotettu */
+            display: none;
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 18px;
@@ -118,19 +106,14 @@
     
     <div class="game-container" id="game-container">
         <div class="notification" id="notification">Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!</div>
-        <div class="game-over" id="game-over">HAHAHA LUUSERI HÄVIS!!!!!</div> <!-- Pelin häviöilmoitus -->
+        <div class="game-over" id="game-over">HAHAHA LUUSERI HÄVIS!!!!!</div>
     </div>
 
-    <button class="button restart-button" id="restart-button">Aloita alusta</button> <!-- Aloita alusta -nappi -->
+    <button class="button restart-button" id="restart-button">Aloita alusta</button>
     
     <div class="header">
         <button class="button" id="juomegista-button">Juomegistä</button>
         <button class="button" id="instructions-button">Ohjeet</button>
-    </div>
-
-    <div class="instructions" id="instructions">
-        <p>Peli on kehitysvaiheessa. Pelin tekijä on ksppk.</p>
-        <button class="button" id="close-instructions">Sulje</button>
     </div>
 
     <script>
@@ -139,19 +122,15 @@
         const highScoreElement = document.getElementById("high-score");
         const juomegistaButton = document.getElementById("juomegista-button");
         const notification = document.getElementById("notification");
-        const instructionsButton = document.getElementById("instructions-button");
-        const instructions = document.getElementById("instructions");
-        const closeInstructions = document.getElementById("close-instructions");
         const gameOverElement = document.getElementById("game-over");
         const restartButton = document.getElementById("restart-button");
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
-        let highScore = 0; // Ennätys
+        let highScore = 0;
 
-        // Kuvien polut (muokkaa näitä polkuja tarpeen mukaan)
         const tileImages = {
-            2: 'images/2.png', // Korvattu 'path/to/...' ja lisätty esimerkkipolku
+            2: 'images/2.png',
             4: 'images/4.png',
             8: 'images/8.png',
             16: 'images/16.png',
@@ -185,24 +164,22 @@
                     tileElement.className = 'tile';
                     if (tile !== 0) {
                         const img = document.createElement('img');
-                        img.src = tileImages[tile] || 'images/default.png'; // Oletuskuva, jos kuvaa ei löydy
+                        img.src = tileImages[tile] || 'images/default.png';
                         tileElement.appendChild(img);
 
                         const sizeLabel = document.createElement('div');
-                        sizeLabel.textContent = tile; // Laatan koko
+                        sizeLabel.textContent = tile;
                         tileElement.appendChild(sizeLabel);
                     }
                     container.appendChild(tileElement);
                 });
             });
-            container.appendChild(notification); // Lisää ilmoitus uudelleen piirron jälkeen
-            container.appendChild(gameOverElement); // Lisää pelin häviöilmoitus
+            container.appendChild(notification);
+            container.appendChild(gameOverElement);
         }
 
         function move(direction) {
             let moved = false;
-
-            // Alustetaan uusi taulukko
             let newBoard = Array(4).fill().map(() => Array(4).fill(0));
 
             const mergeTiles = (row) => {
@@ -211,16 +188,16 @@
                 for (let tile of row) {
                     if (tile !== 0) {
                         if (lastTile === tile) {
-                            newRow[newRow.length - 1] *= 2; // Yhdistä laatan arvo
-                            score += newRow[newRow.length - 1]; // Lisää pistetiliin
-                            lastTile = null; // Nollaa viimeinen laatta
+                            newRow[newRow.length - 1] *= 2;
+                            score += newRow[newRow.length - 1];
+                            lastTile = null;
                         } else {
                             newRow.push(tile);
-                            lastTile = tile; // Aseta viimeiseksi laataksi
+                            lastTile = tile;
                         }
                     }
                 }
-                return newRow.concat(Array(4 - newRow.length).fill(0)); // Täytä loppu nollilla
+                return newRow.concat(Array(4 - newRow.length).fill(0));
             };
 
             const moveTiles = (line) => {
@@ -287,24 +264,17 @@
         }
 
         function checkGameOver() {
-            // Tarkista, onko peli ohi
             let canMove = false;
             for (let row = 0; row < 4; row++) {
                 for (let col = 0; col < 4; col++) {
-                    if (board[row][col] === 0) {
-                        canMove = true; // Vapaata tilaa
-                    }
-                    if (col < 3 && board[row][col] === board[row][col + 1]) {
-                        canMove = true; // Yhdistettävissä vaakasuunnassa
-                    }
-                    if (row < 3 && board[row][col] === board[row + 1][col]) {
-                        canMove = true; // Yhdistettävissä pystysuunnassa
-                    }
+                    if (board[row][col] === 0) canMove = true;
+                    if (col < 3 && board[row][col] === board[row][col + 1]) canMove = true;
+                    if (row < 3 && board[row][col] === board[row + 1][col]) canMove = true;
                 }
             }
             if (!canMove) {
-                gameOverElement.style.display = 'block'; // Näytä häviöilmoitus
-                restartButton.style.display = 'block'; // Näytä uudelleenkäynnistys-nappi
+                gameOverElement.style.display = 'block';
+                restartButton.style.display = 'block';
             }
         }
 
@@ -313,9 +283,9 @@
             score = 0;
             drawBoard();
             updateScore();
-            gameOverElement.style.display = 'none'; // Piilota häviöilmoitus
-            restartButton.style.display = 'none'; // Piilota uudelleenkäynnistys-nappi
-            addNewTile(); // Lisää uusi laatta
+            gameOverElement.style.display = 'none';
+            restartButton.style.display = 'none';
+            addNewTile();
         }
 
         function juomegista() {
@@ -323,29 +293,19 @@
                 for (let row = 0; row < 4; row++) {
                     for (let col = 0; col < 4; col++) {
                         if (board[row][col] < 16) {
-                            board[row][col] = 0; // Poista alle 16
+                            board[row][col] = 0;
                         }
                     }
                 }
                 drawBoard();
-                score -= 1000; // Vähennä pisteet
-                updateScore(); // Päivitä pisteet
-                notification.style.display = 'none'; // Piilota ilmoitus
+                score -= 1000;
+                updateScore();
+                notification.style.display = 'none';
             } else {
-                notification.style.display = 'block'; // Näytä ilmoitus
+                notification.style.display = 'block';
             }
         }
 
-        // Ohjeiden näyttäminen
-        instructionsButton.addEventListener('click', () => {
-            instructions.style.display = 'block'; // Näytä ohjeet
-        });
-
-        closeInstructions.addEventListener('click', () => {
-            instructions.style.display = 'none'; // Piilota ohjeet
-        });
-
-        // Käsittele näppäimistön syötteet
         document.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowUp':
@@ -366,8 +326,8 @@
         restartButton.addEventListener('click', restartGame);
         juomegistaButton.addEventListener('click', juomegista);
 
-        addNewTile(); // Lisää aluksi uusi laatta
-        drawBoard(); // Piirrä alkuperäinen taulukko
+        addNewTile();
+        drawBoard();
     </script>
 
 </body>
