@@ -7,6 +7,7 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -35,14 +36,32 @@
             color: #776e65;
             transition: background-color 0.3s ease, transform 0.1s ease;
         }
+        .score {
+            font-size: 24px;
+            margin: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
+    <div class="score" id="score">Pisteet: 0</div>
     <div class="game-container" id="game-container"></div>
+    <button class="button" id="remove-tile-button">Poista 10 pistettä</button>
+    <button class="button" id="juomegista-button">Juomegistä</button>
+
     <script>
         const container = document.getElementById("game-container");
+        const scoreElement = document.getElementById("score");
+        const removeTileButton = document.getElementById("remove-tile-button");
+        const juomegistaButton = document.getElementById("juomegista-button");
         let board = Array(4).fill().map(() => Array(4).fill(0));
+        let score = 0;
 
         function addNewTile() {
             let emptyCells = [];
@@ -72,7 +91,6 @@
         function move(direction) {
             let moved = false;
 
-            // Define movement functions
             const moveLeft = () => {
                 for (let i = 0; i < 4; i++) {
                     for (let j = 1; j < 4; j++) {
@@ -87,6 +105,7 @@
                             if (k > 0 && board[i][k - 1] === board[i][k]) {
                                 board[i][k - 1] *= 2;
                                 board[i][k] = 0;
+                                score += board[i][k - 1];  // Lisää pisteet
                                 moved = true;
                             }
                         }
@@ -108,6 +127,7 @@
                             if (k < 3 && board[i][k + 1] === board[i][k]) {
                                 board[i][k + 1] *= 2;
                                 board[i][k] = 0;
+                                score += board[i][k + 1];  // Lisää pisteet
                                 moved = true;
                             }
                         }
@@ -129,6 +149,7 @@
                             if (k > 0 && board[k - 1][j] === board[k][j]) {
                                 board[k - 1][j] *= 2;
                                 board[k][j] = 0;
+                                score += board[k - 1][j];  // Lisää pisteet
                                 moved = true;
                             }
                         }
@@ -150,6 +171,7 @@
                             if (k < 3 && board[k + 1][j] === board[k][j]) {
                                 board[k + 1][j] *= 2;
                                 board[k][j] = 0;
+                                score += board[k + 1][j];  // Lisää pisteet
                                 moved = true;
                             }
                         }
@@ -168,6 +190,18 @@
             if (moved) {
                 addNewTile();
                 drawBoard();
+                scoreElement.textContent = `Pisteet: ${score}`;
+            }
+        }
+
+        function removeLowTiles() {
+            if (score >= 1000) {
+                board = board.map(row => row.map(tile => (tile < 16 ? 0 : tile)));
+                score -= 1000; // Vähennä pisteet
+                scoreElement.textContent = `Pisteet: ${score}`;
+                drawBoard();
+            } else {
+                alert("Tarvitset vähintään 1000 pistettä käyttääksesi Juomegistä!");
             }
         }
 
@@ -179,6 +213,17 @@
                 case 'ArrowDown': move('down'); break;
             }
         });
+
+        removeTileButton.addEventListener('click', () => {
+            if (score >= 10) {
+                score -= 10;
+                scoreElement.textContent = `Pisteet: ${score}`;
+            } else {
+                alert("Ei tarpeeksi pisteitä poistaaksesi 10 pistettä!");
+            }
+        });
+
+        juomegistaButton.addEventListener('click', removeLowTiles);
 
         function startGame() {
             addNewTile();
