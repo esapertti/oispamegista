@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opispa Megistä</title>
+    <title>Oispa Megistä</title>
     <style>
         body {
             display: flex;
@@ -187,30 +187,70 @@
         function move(direction) {
             let moved = false;
 
-            const moveLeft = () => {
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 1; j < 4; j++) {
-                        if (board[i][j] !== 0) {
-                            let k = j;
-                            while (k > 0 && board[i][k - 1] === 0) {
-                                board[i][k - 1] = board[i][k];
-                                board[i][k] = 0;
-                                k--;
-                                moved = true;
-                            }
-                            if (k > 0 && board[i][k - 1] === board[i][k]) {
-                                board[i][k - 1] *= 2;
-                                board[i][k] = 0;
-                                score += board[i][k - 1];  // Lisää pisteet
-                                moved = true;
-                            }
-                        }
-                    }
-                }
+            const compress = (row) => {
+                row = row.filter(val => val); // Poista nollat
+                while (row.length < 4) row.push(0); // Täytä loppu nollilla
+                return row;
             };
 
-            if (direction === 'left') moveLeft();
-            // Muut suuntatoiminnot voidaan lisätä täällä (oikea, ylös, alas)
+            const merge = (row) => {
+                for (let i = 0; i < 3; i++) {
+                    if (row[i] && row[i] === row[i + 1]) {
+                        row[i] *= 2;
+                        score += row[i];
+                        row[i + 1] = 0; // Poista yhdistetty laatta
+                        moved = true;
+                    }
+                }
+                return compress(row); // Tiivistä yhdistämisen jälkeen
+            };
+
+            // Vasemmalle liikkuminen
+            if (direction === 'left') {
+                for (let i = 0; i < 4; i++) {
+                    board[i] = compress(board[i]); // Tiivistä rivi
+                    board[i] = merge(board[i]); // Yhdistä laatoja
+                    board[i] = compress(board[i]); // Tiivistä uudelleen
+                }
+                moved = true;
+            }
+            // Oikealle liikkuminen
+            else if (direction === 'right') {
+                for (let i = 0; i < 4; i++) {
+                    board[i] = board[i].reverse(); // Käännä rivi
+                    board[i] = compress(board[i]); // Tiivistä rivi
+                    board[i] = merge(board[i]); // Yhdistä laatoja
+                    board[i] = compress(board[i]); // Tiivistä uudelleen
+                    board[i] = board[i].reverse(); // Käännä takaisin
+                }
+                moved = true;
+            }
+            // Ylös liikkuminen
+            else if (direction === 'up') {
+                for (let j = 0; j < 4; j++) {
+                    let column = [];
+                    for (let i = 0; i < 4; i++) column.push(board[i][j]); // Kerää sarake
+                    column = compress(column); // Tiivistä
+                    column = merge(column); // Yhdistä
+                    column = compress(column); // Tiivistä uudelleen
+                    for (let i = 0; i < 4; i++) board[i][j] = column[i]; // Palauta sarake
+                }
+                moved = true;
+            }
+            // Alas liikkuminen
+            else if (direction === 'down') {
+                for (let j = 0; j < 4; j++) {
+                    let column = [];
+                    for (let i = 0; i < 4; i++) column.push(board[i][j]); // Kerää sarake
+                    column = column.reverse(); // Käännä sarake
+                    column = compress(column); // Tiivistä
+                    column = merge(column); // Yhdistä
+                    column = compress(column); // Tiivistä uudelleen
+                    column = column.reverse(); // Käännä takaisin
+                    for (let i = 0; i < 4; i++) board[i][j] = column[i]; // Palauta sarake
+                }
+                moved = true;
+            }
 
             if (moved) {
                 addNewTile();
@@ -265,7 +305,9 @@
         // Kuuntele näppäimistön tapahtumia
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') move('left');
-            // Voit lisätä muita näppäimiä täällä
+            else if (e.key === 'ArrowRight') move('right');
+            else if (e.key === 'ArrowUp') move('up');
+            else if (e.key === 'ArrowDown') move('down');
         });
     </script>
 </body>
