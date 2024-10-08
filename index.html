@@ -18,10 +18,8 @@
             box-sizing: border-box; /* Ota marginaalit ja padding huomioon */
         }
         .game-container {
-            width: 90vw; /* Aseta leveys suhteessa näkymän leveyteen */
-            max-width: 800px; /* Aseta maksimi leveys */
-            height: 90vw; /* Aseta korkeus suhteessa näkymän leveyteen */
-            max-height: 800px; /* Aseta maksimi korkeus */
+            width: 640px; /* Aseta leveys vakiona */
+            height: 640px; /* Aseta korkeus vakiona */
             background-color: #bbada0;
             border-radius: 10px;
             display: grid;
@@ -80,6 +78,11 @@
 
         /* Media query pienemmille näytöille */
         @media (max-width: 600px) {
+            .game-container {
+                width: 90vw; /* Aseta leveys suhteessa näkymän leveyteen */
+                height: auto; /* Muuta korkeus automaattiseksi */
+                aspect-ratio: 1; /* Pidä suhde 1:1 */
+            }
             .tile {
                 font-size: 28px; /* Pienennä tekstin kokoa */
             }
