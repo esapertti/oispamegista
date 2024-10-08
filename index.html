@@ -60,6 +60,7 @@
             padding: 10px 20px;
             font-size: 18px;
             cursor: pointer;
+            margin-top: 10px; /* Lisää tilaa nappien väliin */
         }
         .notification {
             position: absolute;
@@ -125,6 +126,7 @@
     
     <div class="header">
         <button class="button" id="instructions-button">Ohjeet</button>
+        <button class="button" id="juomegista-button">Juomegistä</button> <!-- Juomegistä -nappi -->
     </div>
 
     <div class="instructions" id="instructions">
@@ -141,6 +143,8 @@
         const closeInstructions = document.getElementById("close-instructions");
         const gameOverElement = document.getElementById("game-over");
         const restartButton = document.getElementById("restart-button");
+        const juomegistaButton = document.getElementById("juomegista-button");
+        const notification = document.getElementById("notification");
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
@@ -213,116 +217,156 @@
 
             const moveLeft = () => {
                 for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 3; j++) {
-                        if (board[i][j] !== 0) {
-                            let k = j;
-                            while (k > 0 && board[i][k - 1] === 0) {
-                                board[i][k - 1] = board[i][k];
-                                board[i][k] = 0;
-                                moved = true;
-                                k--;
-                            }
-                            if (k > 0 && board[i][k - 1] === board[i][k]) {
-                                board[i][k - 1] *= 2;
-                                board[i][k] = 0;
-                                score += board[i][k - 1];
-                                moved = true;
-                            }
+                    let newRow = board[i].filter(tile => tile !== 0);
+                    for (let j = 0; j < newRow.length - 1; j++) {
+                        if (newRow[j] === newRow[j + 1]) {
+                            newRow[j] *= 2;
+                            score += newRow[j];
+                            newRow.splice(j + 1, 1);
                         }
                     }
+                    newRow = newRow.concat(Array(4 - newRow.length).fill(0));
+                    if (!arraysEqual(newRow, board[i])) {
+                        moved = true;
+                    }
+                    board[i] = newRow;
                 }
             };
 
             const moveRight = () => {
                 for (let i = 0; i < 4; i++) {
-                    for (let j = 3; j > 0; j--) {
-                        if (board[i][j] !== 0) {
-                            let k = j;
-                            while (k < 3 && board[i][k + 1] === 0) {
-                                board[i][k + 1] = board[i][k];
-                                board[i][k] = 0;
-                                moved = true;
-                                k++;
-                            }
-                            if (k < 3 && board[i][k + 1] === board[i][k]) {
-                                board[i][k + 1] *= 2;
-                                board[i][k] = 0;
-                                score += board[i][k + 1];
-                                moved = true;
-                            }
+                    let newRow = board[i].filter(tile => tile !== 0).reverse();
+                    for (let j = 0; j < newRow.length - 1; j++) {
+                        if (newRow[j] === newRow[j + 1]) {
+                            newRow[j] *= 2;
+                            score += newRow[j];
+                            newRow.splice(j + 1, 1);
                         }
                     }
+                    newRow = newRow.reverse().concat(Array(4 - newRow.length).fill(0));
+                    if (!arraysEqual(newRow, board[i])) {
+                        moved = true;
+                    }
+                    board[i] = newRow;
                 }
             };
 
             const moveUp = () => {
                 for (let j = 0; j < 4; j++) {
-                    for (let i = 0; i < 3; i++) {
-                        if (board[i][j] !== 0) {
-                            let k = i;
-                            while (k > 0 && board[k - 1][j] === 0) {
-                                board[k - 1][j] = board[k][j];
-                                board[k][j] = 0;
-                                moved = true;
-                                k--;
-                            }
-                            if (k > 0 && board[k - 1][j] === board[k][j]) {
-                                board[k - 1][j] *= 2;
-                                board[k][j] = 0;
-                                score += board[k - 1][j];
-                                moved = true;
-                            }
+                    let newCol = [];
+                    for (let i = 0; i < 4; i++) {
+                        if (board[i][j] !== 0) newCol.push(board[i][j]);
+                    }
+                    for (let k = 0; k < newCol.length - 1; k++) {
+                        if (newCol[k] === newCol[k + 1]) {
+                            newCol[k] *= 2;
+                            score += newCol[k];
+                            newCol.splice(k + 1, 1);
                         }
+                    }
+                    for (let i = 0; i < 4; i++) {
+                        board[i][j] = i < newCol.length ? newCol[i] : 0;
                     }
                 }
             };
 
             const moveDown = () => {
                 for (let j = 0; j < 4; j++) {
-                    for (let i = 3; i > 0; i--) {
-                        if (board[i][j] !== 0) {
-                            let k = i;
-                            while (k < 3 && board[k + 1][j] === 0) {
-                                board[k + 1][j] = board[k][j];
-                                board[k][j] = 0;
-                                moved = true;
-                                k++;
-                            }
-                            if (k < 3 && board[k + 1][j] === board[k][j]) {
-                                board[k + 1][j] *= 2;
-                                board[k][j] = 0;
-                                score += board[k + 1][j];
-                                moved = true;
-                            }
+                    let newCol = [];
+                    for (let i = 0; i < 4; i++) {
+                        if (board[i][j] !== 0) newCol.push(board[i][j]);
+                    }
+                    for (let k = newCol.length - 1; k > 0; k--) {
+                        if (newCol[k] === newCol[k - 1]) {
+                            newCol[k] *= 2;
+                            score += newCol[k];
+                            newCol.splice(k - 1, 1);
                         }
+                    }
+                    for (let i = 0; i < 4; i++) {
+                        board[i][j] = i < newCol.length ? newCol[newCol.length - 1 - i] : 0;
                     }
                 }
             };
 
             switch (direction) {
-                case 'left': moveLeft(); break;
-                case 'right': moveRight(); break;
-                case 'up': moveUp(); break;
-                case 'down': moveDown(); break;
+                case 'left':
+                    moveLeft();
+                    break;
+                case 'right':
+                    moveRight();
+                    break;
+                case 'up':
+                    moveUp();
+                    break;
+                case 'down':
+                    moveDown();
+                    break;
             }
 
             if (moved) {
                 addNewTile();
                 drawBoard();
-                scoreElement.textContent = "Pisteet: " + score;
-
-                if (checkGameOver()) {
-                    gameOverElement.style.display = 'block'; // Näytä pelin häviöilmoitus
-                    restartButton.style.display = 'block'; // Näytä uudelleenaloitus-nappi
-                }
-
+                scoreElement.innerText = `Pisteet: ${score}`;
                 if (score > highScore) {
-                    highScore = score; // Päivitä ennätys
-                    highScoreElement.textContent = "Ennätys: " + highScore;
+                    highScore = score;
+                    highScoreElement.innerText = `Ennätys: ${highScore}`;
                 }
+            }
+
+            if (checkGameOver()) {
+                gameOverElement.style.display = 'block';
+                restartButton.style.display = 'block';
             }
         }
 
+        function arraysEqual(a, b) {
+            return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
+        }
+
+        // Ohjeet-painikkeen tapahtumankäsittelijä
+        instructionsButton.addEventListener("click", () => {
+            instructions.style.display = "block"; // Näytä ohjeet
+        });
+
+        // Sulje-ohjeet-painikkeen tapahtumankäsittelijä
+        closeInstructions.addEventListener("click", () => {
+            instructions.style.display = "none"; // Piilota ohjeet
+        });
+
+        // Aloita alusta -painikkeen tapahtumankäsittelijä
+        restartButton.addEventListener("click", () => {
+            board = Array(4).fill().map(() => Array(4).fill(0));
+            score = 0;
+            scoreElement.innerText = `Pisteet: ${score}`;
+            highScoreElement.innerText = `Ennätys: ${highScore}`;
+            gameOverElement.style.display = 'none';
+            restartButton.style.display = 'none';
+            addNewTile();
+            drawBoard();
+        });
+
+        // Juomegistä -painikkeen tapahtumankäsittelijä
+        juomegistaButton.addEventListener("click", () => {
+            if (score < 1000) {
+                notification.style.display = 'block'; // Näytä ilmoitus
+                setTimeout(() => {
+                    notification.style.display = 'none'; // Piilota ilmoitus
+                }, 3000); // Näytä 3 sekuntia
+            } else {
+                // Poista laatat, joiden arvo on alle 16
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        if (board[i][j] < 16) {
+                            board[i][j] = 0; // Poista laatta
+                        }
+                    }
+                }
+                drawBoard();
+            }
+        });
+
+        // Lisää tapahtumankäsittelijät näppäimille
         document.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowLeft') {
                 move('left');
@@ -335,30 +379,9 @@
             }
         });
 
-        restartButton.addEventListener('click', () => {
-            board = Array(4).fill().map(() => Array(4).fill(0));
-            score = 0;
-            scoreElement.textContent = "Pisteet: 0";
-            highScoreElement.textContent = "Ennätys: " + highScore;
-            gameOverElement.style.display = 'none'; // Piilota pelin häviöilmoitus
-            restartButton.style.display = 'none'; // Piilota uudelleenaloitus-nappi
-            addNewTile();
-            addNewTile();
-            drawBoard();
-        });
-
-        instructionsButton.addEventListener('click', () => {
-            instructions.style.display = 'block'; // Näytä ohjeet
-        });
-
-        closeInstructions.addEventListener('click', () => {
-            instructions.style.display = 'none'; // Piilota ohjeet
-        });
-
-        addNewTile();
+        // Alustetaan peli
         addNewTile();
         drawBoard();
     </script>
-
 </body>
 </html>
