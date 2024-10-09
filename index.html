@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OispaMegistä</title>
+    <title>Oispa Megistä</title>
     <style>
         body {
             display: flex;
@@ -11,19 +11,22 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white;
+            background-color: white; /* Tausta valkoiseksi */
             font-family: Arial, sans-serif;
         }
         .header {
             display: flex;
             justify-content: space-between;
-            width: 400px;
+            width: 400px; /* Oletus leveys */
             margin-bottom: 20px;
         }
         .game-container {
-            width: 400px;
-            height: 400px;
-            background-color: #fff; /* Muutettu valkoiseksi */
+            width: 400px; /* Peliruudun leveys */
+            height: 400px; /* Peliruudun korkeus */
+            background-image: url('images/taustakuva.png'); /* Taustakuva */
+            background-size: cover; /* Varmistaa, että kuva kattaa koko alueen */
+            background-position: center; /* Keskittää kuvan */
+            background-repeat: no-repeat; /* Estää kuvan toistumisen */
             border-radius: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -34,7 +37,7 @@
         .tile {
             width: 90px;
             height: 90px;
-            background-color: #eee4da;
+            background-color: rgba(238, 228, 218, 0.8); /* Lisää läpinäkyvyyttä taustakuva näkyy */
             border-radius: 5px;
             display: flex;
             flex-direction: column;
@@ -88,20 +91,6 @@
             border-radius: 5px;
             z-index: 10;
             text-align: center;
-        }
-
-        /* Fade-out animaatio */
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-            }
-        }
-
-        .tile.fade {
-            animation: fadeOut 0.5s forwards;
         }
     </style>
 </head>
@@ -259,65 +248,63 @@
             if (moved) {
                 addNewTile();
                 drawBoard();
-                scoreElement.textContent = "Pisteet: " + score;
-                if (score > highScore) {
-                    highScore = score;
-                    highScoreElement.textContent = "Ennätys: " + highScore;
-                    localStorage.setItem('highScore', highScore);
-                }
+                updateScore();
             }
         }
 
-        juomegistaButton.addEventListener('click', () => {
+        function updateScore() {
+            scoreElement.textContent = "Pisteet: " + score;
+            if (score > highScore) {
+                highScore = score;
+                highScoreElement.textContent = "Ennätys: " + highScore;
+                localStorage.setItem('highScore', highScore);
+            }
             if (score >= 1000) {
-                score -= 1000;
-                scoreElement.textContent = "Pisteet: " + score;
-                const tilesToFade = [];
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 4; j++) {
-                        if (board[i][j] !== 0 && board[i][j] < 16) {
-                            const tileElement = container.children[i * 4 + j];
-                            tileElement.classList.add('fade');
-                            tilesToFade.push({ x: i, y: j });
-                        }
-                    }
-                }
+                showNotification("Sinulla täytyy olla 1000 pistettä!");
+            }
+        }
 
-                setTimeout(() => {
-                    tilesToFade.forEach(({ x, y }) => {
-                        board[x][y] = 0;
-                    });
-                    drawBoard();
-                }, 500);
-            } else {
-                notification.style.display = 'block';
-                setTimeout(() => notification.style.opacity = '0', 1000);
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.opacity = '0';
                 setTimeout(() => {
                     notification.style.display = 'none';
                     notification.style.opacity = '1';
-                }, 2000);
+                }, 1000);
+            }, 2000);
+        }
+
+        juomegistaButton.addEventListener("click", () => {
+            if (score >= 1000) {
+                score -= 1000;
+                updateScore();
+                // Lisää logiikka juomisen efektille
+            } else {
+                showNotification("Sinulla täytyy olla 1000 pistettä!");
             }
         });
 
-        instructionsButton.addEventListener('click', () => {
+        instructionsButton.addEventListener("click", () => {
             instructions.style.display = 'block';
         });
 
-        closeInstructions.addEventListener('click', () => {
+        closeInstructions.addEventListener("click", () => {
             instructions.style.display = 'none';
         });
 
+        // Aloita peli
+        addNewTile();
+        addNewTile();
         drawBoard();
-        addNewTile();
-        addNewTile();
 
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') move('left');
-            if (e.key === 'ArrowRight') move('right');
-            if (e.key === 'ArrowUp') move('up');
-            if (e.key === 'ArrowDown') move('down');
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft") move('left');
+            if (event.key === "ArrowRight") move('right');
+            if (event.key === "ArrowUp") move('up');
+            if (event.key === "ArrowDown") move('down');
         });
     </script>
-
 </body>
 </html>
