@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa Megistä</title>
+    <title>OispaMegistä</title>
     <style>
         body {
             display: flex;
@@ -113,7 +113,7 @@
     </div>
 
     <div class="instructions" id="instructions">
-        <p>eetu on kivi.</p>
+        <p>Peli on kehitysvaiheessa. Pelin tekijä on ksppk.</p>
         <button class="button" id="close-instructions">Sulje</button>
     </div>
 
@@ -171,7 +171,7 @@
                 row.forEach(tile => {
                     const tileElement = document.createElement('div');
                     tileElement.className = 'tile';
-                    if (tile !== 0) {
+                    if (tile >= 16) { // Vain palikat, joiden arvo on vähintään 16
                         const img = document.createElement('img');
                         img.src = tileImages[tile] || 'images/default.png';
                         tileElement.appendChild(img);
@@ -261,10 +261,18 @@
                 highScoreElement.textContent = "Ennätys: " + highScore;
                 localStorage.setItem('highScore', highScore);
             }
+        }
+
+        juomegistaButton.addEventListener("click", () => {
             if (score >= 1000) {
+                score -= 1000;
+                updateScore();
+                showNotification("Juot Megistä! 1000 pistettä vähennetty.");
+                // Lisää logiikka juomisen efektille
+            } else {
                 showNotification("Sinulla täytyy olla 1000 pistettä!");
             }
-        }
+        });
 
         function showNotification(message) {
             notification.textContent = message;
@@ -277,17 +285,6 @@
                 }, 1000);
             }, 2000);
         }
-
-        juomegistaButton.addEventListener("click", () => {
-            if (score >= 1000) {
-                score -= 1000;
-                updateScore();
-                // Lisää logiikka juomisen efektille
-                showNotification("Juot Megistä! 1000 pistettä vähennetty.");
-            } else {
-                showNotification("Sinulla täytyy olla 1000 pistettä!");
-            }
-        });
 
         instructionsButton.addEventListener("click", () => {
             instructions.style.display = 'block';
