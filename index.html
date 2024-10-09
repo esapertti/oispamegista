@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa Megistä</title>
+    <title>OispaMegistä</title>
     <style>
         body {
             display: flex;
@@ -23,7 +23,7 @@
         .game-container {
             width: 400px;
             height: 400px;
-            background-color: #007BFF; /* Muutettu siniseksi */
+            background-color: #fff; /* Muutettu valkoiseksi */
             border-radius: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -276,19 +276,18 @@
                 for (let i = 0; i < 4; i++) {
                     for (let j = 0; j < 4; j++) {
                         if (board[i][j] !== 0 && board[i][j] < 16) {
-                            const tileElement = container.children[i * 4 + j]; // Löydä vastaava laatta DOM:ista
-                            tileElement.classList.add('fade'); // Lisää fade-luokka
+                            const tileElement = container.children[i * 4 + j];
+                            tileElement.classList.add('fade');
                             tilesToFade.push({ x: i, y: j });
                         }
                     }
                 }
 
-                // Annetaan fade-animaation tapahtua, ennen kuin laatat poistetaan
                 setTimeout(() => {
                     tilesToFade.forEach(({ x, y }) => {
                         board[x][y] = 0;
                     });
-                    drawBoard(); // Piirretään päivitetty pelilauta ilman hävinneitä laattoja
+                    drawBoard();
                 }, 500);
             } else {
                 notification.style.display = 'block';
@@ -308,7 +307,7 @@
             instructions.style.display = 'none';
         });
 
-        drawBoard(); // Piirretään aloitusruudukko
+        drawBoard();
         addNewTile();
         addNewTile();
 
