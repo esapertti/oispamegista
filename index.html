@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa Megistä</title>
+    <title>OispaMegistä</title>
     <style>
         body {
             display: flex;
@@ -11,8 +11,11 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: white;
+            background-image: url('images/taustakuva.png');
+            background-size: cover;
+            background-position: center;
             font-family: Arial, sans-serif;
+            margin: 0;
         }
         .header {
             display: flex;
@@ -23,13 +26,14 @@
         .game-container {
             width: 400px;
             height: 400px;
-            background-color: #fff; /* Muutettu valkoiseksi */
+            background-color: #fff; /* Valkoinen pelilauta */
             border-radius: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             padding: 10px;
             position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .tile {
             width: 90px;
