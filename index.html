@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OispaMegistä</title>
+    <title>Oispa Megistä</title>
     <style>
         body {
             display: flex;
@@ -144,6 +144,7 @@
     
     <div class="header">
         <button class="button" id="juomegista-button">Juomegistä</button>
+        <button class="button" id="edit-high-score-button">Muokkaa ennätystä</button>
         <button class="button" id="instructions-button">Ohjeet</button>
     </div>
 
@@ -157,24 +158,27 @@
     <div class="edit-high-score" id="edit-high-score">
         <p>Syötä salasana muokataksesi ennätystä:</p>
         <input type="password" id="password" placeholder="Salasana">
-        <p>Syötä uusi ennätys:</p>
-        <input type="number" id="new-high-score" min="0">
-        <p>Valitse palikoita:</p>
-        <div class="tile-select">
-            <label><input type="checkbox" value="2" checked> 2</label>
-            <label><input type="checkbox" value="4" checked> 4</label>
-            <label><input type="checkbox" value="8" checked> 8</label>
-            <label><input type="checkbox" value="16" checked> 16</label>
-            <label><input type="checkbox" value="32" checked> 32</label>
-            <label><input type="checkbox" value="64" checked> 64</label>
-            <label><input type="checkbox" value="128" checked> 128</label>
-            <label><input type="checkbox" value="256"> 256</label>
-            <label><input type="checkbox" value="512"> 512</label>
-            <label><input type="checkbox" value="1024"> 1024</label>
-            <label><input type="checkbox" value="2048"> 2048</label>
+        <button class="button" id="submit-password">Aseta salasana</button>
+        <div class="high-score-settings" style="display: none;">
+            <p>Syötä uusi ennätys:</p>
+            <input type="number" id="new-high-score" min="0">
+            <p>Valitse palikoita:</p>
+            <div class="tile-select">
+                <label><input type="checkbox" value="2" checked> 2</label>
+                <label><input type="checkbox" value="4"> 4</label>
+                <label><input type="checkbox" value="8"> 8</label>
+                <label><input type="checkbox" value="16"> 16</label>
+                <label><input type="checkbox" value="32"> 32</label>
+                <label><input type="checkbox" value="64"> 64</label>
+                <label><input type="checkbox" value="128"> 128</label>
+                <label><input type="checkbox" value="256"> 256</label>
+                <label><input type="checkbox" value="512"> 512</label>
+                <label><input type="checkbox" value="1024"> 1024</label>
+                <label><input type="checkbox" value="2048"> 2048</label>
+            </div>
+            <button class="button" id="set-high-score">Aseta</button>
+            <button class="button" id="close-edit-high-score">Sulje</button>
         </div>
-        <button class="button" id="set-high-score">Aseta</button>
-        <button class="button" id="close-edit-high-score">Sulje</button>
     </div>
 
     <script>
@@ -191,11 +195,13 @@
         const newHighScoreInput = document.getElementById("new-high-score");
         const passwordInput = document.getElementById("password");
         const closeEditHighScoreButton = document.getElementById("close-edit-high-score");
+        const submitPasswordButton = document.getElementById("submit-password");
+        const highScoreSettings = document.querySelector('.high-score-settings');
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
         let highScore = 0;
-        let tileValues = [2, 4, 8, 16, 32, 64, 128]; // Oletusarvoiset palikat
+        let tileValues = [2]; // Aluksi vain 2-palikot
 
         const storedHighScore = localStorage.getItem('highScore');
         if (storedHighScore) {
@@ -219,7 +225,7 @@
         };
 
         function addNewTile() {
-            let emptyCells = [];
+            const emptyCells = [];
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
                     if (board[i][j] === 0) {
@@ -374,21 +380,32 @@
 
         closeEditHighScoreButton.addEventListener('click', () => {
             editHighScoreDialog.style.display = 'none';
+            highScoreSettings.style.display = 'none'; // Piilota asetukset, kun suljet dialogin
+        });
+
+        submitPasswordButton.addEventListener('click', () => {
+            const password = passwordInput.value;
+            if (password === 'Juusto.kakku09') {
+                highScoreSettings.style.display = 'block'; // Näytä asetukset, jos salasana on oikein
+                passwordInput.value = ''; // Tyhjennä salasana
+            } else {
+                alert("Väärä salasana!");
+            }
         });
 
         setHighScoreButton.addEventListener('click', () => {
-            const password = passwordInput.value;
             const newHighScore = parseInt(newHighScoreInput.value, 10);
             const selectedTiles = Array.from(document.querySelectorAll('.tile-select input:checked')).map(input => parseInt(input.value));
 
-            if (password === 'Juusto.kakku09' && !isNaN(newHighScore)) {
+            if (!isNaN(newHighScore)) {
                 highScore = newHighScore;
                 tileValues = selectedTiles; // Päivitä käytettävät palikat
                 highScoreElement.textContent = "Ennätys: " + highScore;
                 localStorage.setItem('highScore', highScore);
                 editHighScoreDialog.style.display = 'none';
+                newHighScoreInput.value = ''; // Tyhjennä uusi ennätys
             } else {
-                alert("Väärä salasana tai virheellinen ennätys!");
+                alert("Virheellinen ennätys!");
             }
         });
 
