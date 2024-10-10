@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OispaMegistä</title>
+    <title>Oispa Megistä</title>
     <style>
         body {
             display: flex;
@@ -153,7 +153,7 @@
 
     <div class="edit-high-score" id="edit-high-score">
         <p>Syötä salasana muokataksesi ennätystä:</p>
-        <input type="password" id="password" placeholder="ksppk.123">
+        <input type="password" id="password" placeholder="Salasana">
         <p>Syötä uusi ennätys:</p>
         <input type="number" id="new-high-score" min="0">
         <button class="button" id="set-high-score">Aseta</button>
@@ -353,7 +353,7 @@
         setHighScoreButton.addEventListener('click', () => {
             const password = passwordInput.value;
             const newHighScore = parseInt(newHighScoreInput.value, 10);
-            if (password === 'salasana' && !isNaN(newHighScore)) {
+            if (password === 'Juusto.kakku09' && !isNaN(newHighScore)) {
                 highScore = newHighScore;
                 highScoreElement.textContent = "Ennätys: " + highScore;
                 localStorage.setItem('highScore', highScore);
