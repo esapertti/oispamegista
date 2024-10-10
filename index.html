@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OispaMegistä</title>
+    <title>Oispa Megistä</title>
     <style>
         body {
             display: flex;
@@ -11,11 +11,9 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-image: url('images/taustakuva.png');
+            background: url('images/taustakuva.png') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
             font-family: Arial, sans-serif;
-            margin: 0;
         }
         .header {
             display: flex;
@@ -26,14 +24,13 @@
         .game-container {
             width: 400px;
             height: 400px;
-            background-color: #fff; /* Valkoinen pelilauta */
+            background-color: white; /* Valkoinen tausta peliruudukolle */
             border-radius: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             padding: 10px;
             position: relative;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .tile {
             width: 90px;
@@ -44,8 +41,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            position: relative;
+            position: absolute; /* Absoluuttinen sijainti, jotta siirtymä toimii */
+            transition: transform 0.3s ease; /* Siirtymäliike */
         }
         .tile img {
             max-width: 60px;
@@ -121,7 +118,7 @@
     </div>
     
     <div class="header">
-        <button class="button" id="juomegista-button">Juomegistä</button>
+        <button class="button" id="juomegista-button">Juomegista</button>
         <button class="button" id="instructions-button">Ohjeet</button>
     </div>
 
@@ -180,20 +177,24 @@
 
         function drawBoard() {
             container.innerHTML = '';
-            board.forEach(row => {
-                row.forEach(tile => {
-                    const tileElement = document.createElement('div');
-                    tileElement.className = 'tile';
+            board.forEach((row, rowIndex) => {
+                row.forEach((tile, colIndex) => {
                     if (tile !== 0) {
-                        const img = document.createElement('img');
-                        img.src = tileImages[tile] || 'images/default.png';
-                        tileElement.appendChild(img);
+                        const tileElement = document.createElement('div');
+                        tileElement.className = 'tile';
+                        if (tile !== 0) {
+                            const img = document.createElement('img');
+                            img.src = tileImages[tile] || 'images/default.png';
+                            tileElement.appendChild(img);
 
-                        const sizeLabel = document.createElement('div');
-                        sizeLabel.textContent = tile;
-                        tileElement.appendChild(sizeLabel);
+                            const sizeLabel = document.createElement('div');
+                            sizeLabel.textContent = tile;
+                            tileElement.appendChild(sizeLabel);
+                        }
+                        // Asetetaan jokaisen palikan sijainti gridissä
+                        tileElement.style.transform = `translate(${colIndex * 100}px, ${rowIndex * 100}px)`;
+                        container.appendChild(tileElement);
                     }
-                    container.appendChild(tileElement);
                 });
             });
             container.appendChild(notification);
@@ -264,43 +265,31 @@
                 addNewTile();
                 drawBoard();
                 scoreElement.textContent = "Pisteet: " + score;
+
+                if (score >= 1000) {
+                    notification.style.display = "block";
+                    setTimeout(() => {
+                        notification.style.opacity = 0;
+                    }, 2000);
+                }
+
                 if (score > highScore) {
                     highScore = score;
-                    highScoreElement.textContent = "Ennätys: " + highScore;
                     localStorage.setItem('highScore', highScore);
+                    highScoreElement.textContent = "Ennätys: " + highScore;
                 }
             }
         }
 
-        juomegistaButton.addEventListener('click', () => {
-            if (score >= 1000) {
-                score -= 1000;
-                scoreElement.textContent = "Pisteet: " + score;
-                const tilesToFade = [];
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 4; j++) {
-                        if (board[i][j] !== 0 && board[i][j] < 16) {
-                            const tileElement = container.children[i * 4 + j];
-                            tileElement.classList.add('fade');
-                            tilesToFade.push({ x: i, y: j });
-                        }
-                    }
-                }
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') move('left');
+            else if (event.key === 'ArrowRight') move('right');
+            else if (event.key === 'ArrowUp') move('up');
+            else if (event.key === 'ArrowDown') move('down');
+        });
 
-                setTimeout(() => {
-                    tilesToFade.forEach(({ x, y }) => {
-                        board[x][y] = 0;
-                    });
-                    drawBoard();
-                }, 500);
-            } else {
-                notification.style.display = 'block';
-                setTimeout(() => notification.style.opacity = '0', 1000);
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                    notification.style.opacity = '1';
-                }, 2000);
-            }
+        juomegistaButton.addEventListener('click', () => {
+            location.href = 'https://ksppk.itch.io/oispagreatest';
         });
 
         instructionsButton.addEventListener('click', () => {
@@ -311,17 +300,10 @@
             instructions.style.display = 'none';
         });
 
+        // Alustetaan peli
+        addNewTile();
+        addNewTile();
         drawBoard();
-        addNewTile();
-        addNewTile();
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') move('left');
-            if (e.key === 'ArrowRight') move('right');
-            if (e.key === 'ArrowUp') move('up');
-            if (e.key === 'ArrowDown') move('down');
-        });
     </script>
-
 </body>
 </html>
