@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa Megistä</title>
+    <title>OispaMegistä</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <style>
         body {
             display: flex;
@@ -106,13 +107,11 @@
             z-index: 10;
             text-align: center;
         }
-
         .edit-high-score input {
             width: 100%;
             padding: 10px;
             margin: 5px 0;
         }
-
         /* Fade-out animaatio */
         @keyframes fadeOut {
             from {
@@ -122,9 +121,23 @@
                 opacity: 0;
             }
         }
-
         .tile.fade {
             animation: fadeOut 0.5s forwards;
+        }
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 2px solid red;
+            border-radius: 5px;
+            z-index: 20;
+            text-align: center;
+            font-family: 'Pacifico', cursive;
+            font-size: 36px;
+            display: none;
         }
     </style>
 </head>
@@ -160,6 +173,10 @@
         <button class="button" id="close-edit-high-score">Sulje</button>
     </div>
 
+    <div class="game-over" id="game-over">
+        <p>HAHAA, OPETTLE PELAA!</p>
+    </div>
+
     <script>
         const container = document.getElementById("game-container");
         const scoreElement = document.getElementById("score");
@@ -174,6 +191,7 @@
         const newHighScoreInput = document.getElementById("new-high-score");
         const passwordInput = document.getElementById("password");
         const closeEditHighScoreButton = document.getElementById("close-edit-high-score");
+        const gameOverDialog = document.getElementById("game-over");
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
@@ -204,184 +222,136 @@
             let emptyCells = [];
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
-                    if (board[i][j] === 0) emptyCells.push({ x: i, y: j });
+                    if (board[i][j] === 0) {
+                        emptyCells.push({ x: i, y: j });
+                    }
                 }
             }
-            if (emptyCells.length) {
+            if (emptyCells.length > 0) {
                 const { x, y } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                board[x][y] = Math.random() < 0.9 ? 2 : 4;
+                board[x][y] = Math.random() < 0.9 ? 2 : 4; // 90% chance for 2, 10% for 4
             }
+            render();
         }
 
-        function drawBoard() {
+        function render() {
             container.innerHTML = '';
-            board.forEach(row => {
-                row.forEach(tile => {
-                    const tileElement = document.createElement('div');
-                    tileElement.className = 'tile';
-                    if (tile !== 0) {
-                        const img = document.createElement('img');
-                        img.src = tileImages[tile] || 'images/default.png';
-                        tileElement.appendChild(img);
-
-                        const sizeLabel = document.createElement('div');
-                        sizeLabel.textContent = tile;
-                        tileElement.appendChild(sizeLabel);
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const tile = document.createElement("div");
+                    tile.className = "tile";
+                    if (board[i][j] > 0) {
+                        tile.textContent = board[i][j];
+                        const img = document.createElement("img");
+                        img.src = tileImages[board[i][j]];
+                        tile.appendChild(img);
                     }
-                    container.appendChild(tileElement);
-                });
-            });
-            container.appendChild(notification);
+                    container.appendChild(tile);
+                }
+            }
+            scoreElement.textContent = "Pisteet: " + score;
+            highScoreElement.textContent = "Ennätys: " + highScore;
+            checkGameOver();
         }
 
-        function move(direction) {
-            let moved = false;
-
-            const compress = (row) => {
-                row = row.filter(val => val);
-                while (row.length < 4) row.push(0);
-                return row;
-            };
-
-            const merge = (row) => {
-                for (let i = 0; i < 3; i++) {
-                    if (row[i] && row[i] === row[i + 1]) {
-                        row[i] *= 2;
-                        score += row[i];
-                        row[i + 1] = 0;
-                        moved = true;
+        function checkGameOver() {
+            // Check if the board is full
+            let fullBoard = true;
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (board[i][j] === 0) {
+                        fullBoard = false;
+                        break;
                     }
                 }
-                return compress(row);
-            };
-
-            if (direction === 'left') {
-                for (let i = 0; i < 4; i++) {
-                    board[i] = compress(board[i]);
-                    board[i] = merge(board[i]);
-                    board[i] = compress(board[i]);
-                }
-                moved = true;
-            } else if (direction === 'right') {
-                for (let i = 0; i < 4; i++) {
-                    board[i] = board[i].reverse();
-                    board[i] = compress(board[i]);
-                    board[i] = merge(board[i]);
-                    board[i] = compress(board[i]);
-                    board[i] = board[i].reverse();
-                }
-                moved = true;
-            } else if (direction === 'up') {
-                for (let j = 0; j < 4; j++) {
-                    let column = [];
-                    for (let i = 0; i < 4; i++) column.push(board[i][j]);
-                    column = compress(column);
-                    column = merge(column);
-                    column = compress(column);
-                    for (let i = 0; i < 4; i++) board[i][j] = column[i];
-                }
-                moved = true;
-            } else if (direction === 'down') {
-                for (let j = 0; j < 4; j++) {
-                    let column = [];
-                    for (let i = 0; i < 4; i++) column.push(board[i][j]);
-                    column = column.reverse();
-                    column = compress(column);
-                    column = merge(column);
-                    column = compress(column);
-                    column = column.reverse();
-                    for (let i = 0; i < 4; i++) board[i][j] = column[i];
-                }
-                moved = true;
+                if (!fullBoard) break;
             }
 
-            if (moved) {
-                addNewTile();
-                drawBoard();
-                scoreElement.textContent = "Pisteet: " + score;
-                if (score > highScore) {
-                    highScore = score;
-                    highScoreElement.textContent = "Ennätys: " + highScore;
-                    localStorage.setItem('highScore', highScore);
-                }
+            // Show game over screen if board is full
+            if (fullBoard) {
+                gameOverDialog.style.display = "block";
+                const fadeOutAnimation = () => {
+                    gameOverDialog.style.opacity = 0;
+                };
+                setTimeout(fadeOutAnimation, 3000); // Fade out after 3 seconds
             }
         }
 
-        juomegistaButton.addEventListener('click', () => {
+        function handleKeyPress(e) {
+            if (e.key === "ArrowUp") {
+                moveUp();
+            } else if (e.key === "ArrowDown") {
+                moveDown();
+            } else if (e.key === "ArrowLeft") {
+                moveLeft();
+            } else if (e.key === "ArrowRight") {
+                moveRight();
+            }
+        }
+
+        function moveUp() {
+            // Implement moving up logic
+            // After moving, add a new tile
+            addNewTile();
+        }
+
+        function moveDown() {
+            // Implement moving down logic
+            // After moving, add a new tile
+            addNewTile();
+        }
+
+        function moveLeft() {
+            // Implement moving left logic
+            // After moving, add a new tile
+            addNewTile();
+        }
+
+        function moveRight() {
+            // Implement moving right logic
+            // After moving, add a new tile
+            addNewTile();
+        }
+
+        document.addEventListener("keydown", handleKeyPress);
+
+        juomegistaButton.addEventListener("click", function () {
             if (score >= 1000) {
-                score -= 1000;
-                scoreElement.textContent = "Pisteet: " + score;
-                const tilesToFade = [];
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 4; j++) {
-                        if (board[i][j] !== 0 && board[i][j] < 16) {
-                            const tileElement = container.children[i * 4 + j];
-                            tileElement.classList.add('fade');
-                            tilesToFade.push({ x: i, y: j });
-                        }
-                    }
-                }
-
+                notification.style.display = "block";
                 setTimeout(() => {
-                    tilesToFade.forEach(({ x, y }) => {
-                        board[x][y] = 0;
-                    });
-                    drawBoard();
-                }, 500);
-            } else {
-                notification.style.display = 'block';
-                setTimeout(() => notification.style.opacity = '0', 1000);
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                    notification.style.opacity = '1';
-                }, 2000);
+                    notification.style.display = "none";
+                }, 3000);
             }
         });
 
-        instructionsButton.addEventListener('click', () => {
-            instructions.style.display = 'block';
+        instructionsButton.addEventListener("click", function () {
+            instructions.style.display = "block";
         });
 
-        closeInstructions.addEventListener('click', () => {
-            instructions.style.display = 'none';
+        closeInstructions.addEventListener("click", function () {
+            instructions.style.display = "none";
         });
 
-        closeEditHighScoreButton.addEventListener('click', () => {
-            editHighScoreDialog.style.display = 'none';
-        });
-
-        setHighScoreButton.addEventListener('click', () => {
+        setHighScoreButton.addEventListener("click", function () {
             const password = passwordInput.value;
-            const newHighScore = parseInt(newHighScoreInput.value, 10);
-            if (password === 'Juusto.kakku09' && !isNaN(newHighScore)) {
-                highScore = newHighScore;
-                highScoreElement.textContent = "Ennätys: " + highScore;
+            const newHighScoreValue = newHighScoreInput.value;
+            if (password === "oispamegista" && newHighScoreValue > highScore) {
+                highScore = newHighScoreValue;
                 localStorage.setItem('highScore', highScore);
-                editHighScoreDialog.style.display = 'none';
+                highScoreElement.textContent = "Ennätys: " + highScore;
+                editHighScoreDialog.style.display = "none";
             } else {
-                alert("Väärä salasana tai virheellinen ennätys!");
+                alert("Virheellinen salasana tai ennätys ei ole suurempi!");
             }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'P') {
-                editHighScoreDialog.style.display = 'block';
-                passwordInput.value = ''; // Tyhjennä salasana
-                newHighScoreInput.value = ''; // Tyhjennä uusi ennätys
-            }
+        closeEditHighScoreButton.addEventListener("click", function () {
+            editHighScoreDialog.style.display = "none";
         });
 
-        drawBoard();
+        // Initial setup
         addNewTile();
-        addNewTile();
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') move('left');
-            if (e.key === 'ArrowRight') move('right');
-            if (e.key === 'ArrowUp') move('up');
-            if (e.key === 'ArrowDown') move('down');
-        });
+        addNewTile(); // Add two initial tiles
     </script>
-
 </body>
 </html>
