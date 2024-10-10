@@ -106,14 +106,11 @@
             z-index: 10;
             text-align: center;
         }
-        .edit-high-score input, .tile-select {
+
+        .edit-high-score input {
             width: 100%;
             padding: 10px;
             margin: 5px 0;
-        }
-        .tile-select {
-            display: flex;
-            flex-direction: column;
         }
 
         /* Fade-out animaatio */
@@ -144,7 +141,6 @@
     
     <div class="header">
         <button class="button" id="juomegista-button">Juomegistä</button>
-        <button class="button" id="edit-high-score-button">Muokkaa ennätystä</button>
         <button class="button" id="instructions-button">Ohjeet</button>
     </div>
 
@@ -158,27 +154,10 @@
     <div class="edit-high-score" id="edit-high-score">
         <p>Syötä salasana muokataksesi ennätystä:</p>
         <input type="password" id="password" placeholder="Salasana">
-        <button class="button" id="submit-password">Aseta salasana</button>
-        <div class="high-score-settings" style="display: none;">
-            <p>Syötä uusi ennätys:</p>
-            <input type="number" id="new-high-score" min="0">
-            <p>Valitse palikoita:</p>
-            <div class="tile-select">
-                <label><input type="checkbox" value="2" checked> 2</label>
-                <label><input type="checkbox" value="4"> 4</label>
-                <label><input type="checkbox" value="8"> 8</label>
-                <label><input type="checkbox" value="16"> 16</label>
-                <label><input type="checkbox" value="32"> 32</label>
-                <label><input type="checkbox" value="64"> 64</label>
-                <label><input type="checkbox" value="128"> 128</label>
-                <label><input type="checkbox" value="256"> 256</label>
-                <label><input type="checkbox" value="512"> 512</label>
-                <label><input type="checkbox" value="1024"> 1024</label>
-                <label><input type="checkbox" value="2048"> 2048</label>
-            </div>
-            <button class="button" id="set-high-score">Aseta</button>
-            <button class="button" id="close-edit-high-score">Sulje</button>
-        </div>
+        <p>Syötä uusi ennätys:</p>
+        <input type="number" id="new-high-score" min="0">
+        <button class="button" id="set-high-score">Aseta</button>
+        <button class="button" id="close-edit-high-score">Sulje</button>
     </div>
 
     <script>
@@ -195,13 +174,10 @@
         const newHighScoreInput = document.getElementById("new-high-score");
         const passwordInput = document.getElementById("password");
         const closeEditHighScoreButton = document.getElementById("close-edit-high-score");
-        const submitPasswordButton = document.getElementById("submit-password");
-        const highScoreSettings = document.querySelector('.high-score-settings');
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
         let highScore = 0;
-        let tileValues = [2]; // Aluksi vain 2-palikot
 
         const storedHighScore = localStorage.getItem('highScore');
         if (storedHighScore) {
@@ -225,59 +201,51 @@
         };
 
         function addNewTile() {
-            const emptyCells = [];
+            let emptyCells = [];
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
-                    if (board[i][j] === 0) {
-                        emptyCells.push({ x: i, y: j });
-                    }
+                    if (board[i][j] === 0) emptyCells.push({ x: i, y: j });
                 }
             }
-            if (emptyCells.length > 0) {
+            if (emptyCells.length) {
                 const { x, y } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                const randomValue = tileValues[Math.floor(Math.random() * tileValues.length)];
-                board[x][y] = randomValue;
+                board[x][y] = Math.random() < 0.9 ? 2 : 4;
             }
         }
 
         function drawBoard() {
-            container.innerHTML = "";
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    const tileValue = board[i][j];
-                    const tileElement = document.createElement("div");
-                    tileElement.classList.add("tile");
-                    if (tileValue !== 0) {
-                        tileElement.innerHTML = `<img src="${tileImages[tileValue]}" alt="${tileValue}"><span>${tileValue}</span>`;
+            container.innerHTML = '';
+            board.forEach(row => {
+                row.forEach(tile => {
+                    const tileElement = document.createElement('div');
+                    tileElement.className = 'tile';
+                    if (tile !== 0) {
+                        const img = document.createElement('img');
+                        img.src = tileImages[tile] || 'images/default.png';
+                        tileElement.appendChild(img);
+
+                        const sizeLabel = document.createElement('div');
+                        sizeLabel.textContent = tile;
+                        tileElement.appendChild(sizeLabel);
                     }
                     container.appendChild(tileElement);
-                }
-            }
-        }
-
-        function compress(row) {
-            return row.filter(value => value !== 0).concat(Array(4).fill(0).slice(row.length));
-        }
-
-        function merge(row) {
-            let moved = false;
-            for (let i = 0; i < row.length - 1; i++) {
-                if (row[i] === row[i + 1] && row[i] !== 0) {
-                    row[i] *= 2;
-                    score += row[i];
-                    row[i + 1] = 0;
-                    moved = true;
-                }
-            }
-            return compress(row);
+                });
+            });
+            container.appendChild(notification);
         }
 
         function move(direction) {
             let moved = false;
 
+            const compress = (row) => {
+                row = row.filter(val => val);
+                while (row.length < 4) row.push(0);
+                return row;
+            };
+
             const merge = (row) => {
-                for (let i = 0; i < row.length - 1; i++) {
-                    if (row[i] === row[i + 1] && row[i] !== 0) {
+                for (let i = 0; i < 3; i++) {
+                    if (row[i] && row[i] === row[i + 1]) {
                         row[i] *= 2;
                         score += row[i];
                         row[i + 1] = 0;
@@ -380,32 +348,18 @@
 
         closeEditHighScoreButton.addEventListener('click', () => {
             editHighScoreDialog.style.display = 'none';
-            highScoreSettings.style.display = 'none'; // Piilota asetukset, kun suljet dialogin
-        });
-
-        submitPasswordButton.addEventListener('click', () => {
-            const password = passwordInput.value;
-            if (password === 'Juusto.kakku09') {
-                highScoreSettings.style.display = 'block'; // Näytä asetukset, jos salasana on oikein
-                passwordInput.value = ''; // Tyhjennä salasana
-            } else {
-                alert("Väärä salasana!");
-            }
         });
 
         setHighScoreButton.addEventListener('click', () => {
+            const password = passwordInput.value;
             const newHighScore = parseInt(newHighScoreInput.value, 10);
-            const selectedTiles = Array.from(document.querySelectorAll('.tile-select input:checked')).map(input => parseInt(input.value));
-
-            if (!isNaN(newHighScore)) {
+            if (password === 'Juusto.kakku09' && !isNaN(newHighScore)) {
                 highScore = newHighScore;
-                tileValues = selectedTiles; // Päivitä käytettävät palikat
                 highScoreElement.textContent = "Ennätys: " + highScore;
                 localStorage.setItem('highScore', highScore);
                 editHighScoreDialog.style.display = 'none';
-                newHighScoreInput.value = ''; // Tyhjennä uusi ennätys
             } else {
-                alert("Virheellinen ennätys!");
+                alert("Väärä salasana tai virheellinen ennätys!");
             }
         });
 
