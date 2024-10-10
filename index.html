@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oispa Megistä</title>
+    <title>OispaMegistä</title>
     <style>
         body {
             display: flex;
@@ -93,6 +93,25 @@
             z-index: 10;
             text-align: center;
         }
+        .edit-high-score {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 2px solid red;
+            border-radius: 5px;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .edit-high-score input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
 
         /* Fade-out animaatio */
         @keyframes fadeOut {
@@ -132,6 +151,15 @@
         <button class="button" id="close-instructions">Sulje</button>
     </div>
 
+    <div class="edit-high-score" id="edit-high-score">
+        <p>Syötä salasana muokataksesi ennätystä:</p>
+        <input type="password" id="password" placeholder="ksppk.123">
+        <p>Syötä uusi ennätys:</p>
+        <input type="number" id="new-high-score" min="0">
+        <button class="button" id="set-high-score">Aseta</button>
+        <button class="button" id="close-edit-high-score">Sulje</button>
+    </div>
+
     <script>
         const container = document.getElementById("game-container");
         const scoreElement = document.getElementById("score");
@@ -141,6 +169,11 @@
         const instructionsButton = document.getElementById("instructions-button");
         const instructions = document.getElementById("instructions");
         const closeInstructions = document.getElementById("close-instructions");
+        const editHighScoreDialog = document.getElementById("edit-high-score");
+        const setHighScoreButton = document.getElementById("set-high-score");
+        const newHighScoreInput = document.getElementById("new-high-score");
+        const passwordInput = document.getElementById("password");
+        const closeEditHighScoreButton = document.getElementById("close-edit-high-score");
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
@@ -311,6 +344,31 @@
 
         closeInstructions.addEventListener('click', () => {
             instructions.style.display = 'none';
+        });
+
+        closeEditHighScoreButton.addEventListener('click', () => {
+            editHighScoreDialog.style.display = 'none';
+        });
+
+        setHighScoreButton.addEventListener('click', () => {
+            const password = passwordInput.value;
+            const newHighScore = parseInt(newHighScoreInput.value, 10);
+            if (password === 'salasana' && !isNaN(newHighScore)) {
+                highScore = newHighScore;
+                highScoreElement.textContent = "Ennätys: " + highScore;
+                localStorage.setItem('highScore', highScore);
+                editHighScoreDialog.style.display = 'none';
+            } else {
+                alert("Väärä salasana tai virheellinen ennätys!");
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+                editHighScoreDialog.style.display = 'block';
+                passwordInput.value = ''; // Tyhjennä salasana
+                newHighScoreInput.value = ''; // Tyhjennä uusi ennätys
+            }
         });
 
         drawBoard();
